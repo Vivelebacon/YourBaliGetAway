@@ -1,35 +1,48 @@
 'use client'
 
+import { useEffect, useRef } from 'react'
 import Script from 'next/script'
 
-// Embed the Smoobu booking widget exactly as provided by Smoobu dashboard.
-// Do NOT modify the URL or add query params — Smoobu controls language/currency
-// from its own dashboard settings (Booking Engine > Booking System Settings).
-
 const SMOOBU_ALL_ID = '1690897'
+const SCRIPT_SRC = 'https://login.smoobu.com/js/Settings/BookingToolIframe.js'
 
 interface BookingWidgetProps {
   widgetId?: string
 }
 
+function initWidget(id: string) {
+  // @ts-expect-error: BookingToolIframe injected by Smoobu script
+  if (typeof window !== 'undefined' && window.BookingToolIframe) {
+    // @ts-expect-error
+    window.BookingToolIframe.initialize({
+      url: `https://login.smoobu.com/en/booking-tool/iframe/${id}?locale=en_US`,
+      baseUrl: 'https://login.smoobu.com',
+      target: `#apartmentIframe-${id}`,
+    })
+  }
+}
+
 export default function BookingWidget({ widgetId }: BookingWidgetProps = {}) {
   const id = widgetId ?? SMOOBU_ALL_ID
-  const containerId = `apartmentIframe-${id}`
+  const initialized = useRef(false)
+
+  // Re-initialize on mount (handles client-side navigation where script is already loaded)
+  useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+
+    // Small delay to let the container render
+    const t = setTimeout(() => initWidget(id), 100)
+    return () => clearTimeout(t)
+  }, [id])
 
   return (
     <div className="smoobu-widget-wrapper w-full min-h-[600px]">
-      <div id={containerId} />
+      <div id={`apartmentIframe-${id}`} />
       <Script
-        src="https://login.smoobu.com/js/Settings/BookingToolIframe.js"
+        src={SCRIPT_SRC}
         strategy="afterInteractive"
-        onLoad={() => {
-          // @ts-expect-error: BookingToolIframe injected by Smoobu script
-          window.BookingToolIframe.initialize({
-            url: `https://login.smoobu.com/en/booking-tool/iframe/${id}?locale=en_US`,
-            baseUrl: 'https://login.smoobu.com',
-            target: `#${containerId}`,
-          })
-        }}
+        onLoad={() => initWidget(id)}
       />
     </div>
   )
