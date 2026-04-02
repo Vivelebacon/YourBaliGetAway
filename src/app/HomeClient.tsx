@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import BookingWidget from '@/components/BookingWidget'
+import ReviewCarousel from '@/components/ReviewCarousel'
 import { villas } from '@/lib/villas'
 
 export default function HomeClient() {
@@ -142,6 +143,19 @@ export default function HomeClient() {
           <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
             <BookingWidget />
           </div>
+        </div>
+      </section>
+
+      {/* ── Reviews Carousel ── */}
+      <section className="py-24 px-6 bg-villa-cream">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Guest Experiences</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-villa-dark font-light">
+              What Our Guests Say
+            </h2>
+          </div>
+          <ReviewCarousel />
         </div>
       </section>
 
