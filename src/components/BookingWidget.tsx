@@ -3,46 +3,56 @@
 import { useEffect, useRef } from 'react'
 import Script from 'next/script'
 
-const SMOOBU_ALL_ID = '1690897'
+const SMOOBU_GROUP_ID = '1690897'
 const SCRIPT_SRC = 'https://login.smoobu.com/js/Settings/BookingToolIframe.js'
 
 interface BookingWidgetProps {
+  // Per-villa apartment ID (e.g. "3241317"). Omit for the all-villas homepage widget.
   widgetId?: string
 }
 
-function initWidget(id: string) {
-  // @ts-expect-error: BookingToolIframe injected by Smoobu script
-  if (typeof window !== 'undefined' && window.BookingToolIframe) {
-    // @ts-expect-error
-    window.BookingToolIframe.initialize({
-      url: `https://login.smoobu.com/en/booking-tool/iframe/${id}?locale=en_US`,
-      baseUrl: 'https://login.smoobu.com',
-      target: `#apartmentIframe-${id}`,
-    })
+function buildWidgetUrl(villaId?: string) {
+  if (villaId) {
+    return `https://login.smoobu.com/en/booking-tool/iframe/${SMOOBU_GROUP_ID}/${villaId}`
   }
+  return `https://login.smoobu.com/en/booking-tool/iframe/${SMOOBU_GROUP_ID}`
+}
+
+function buildContainerId(villaId?: string) {
+  return villaId ? `apartmentIframe${villaId}` : `apartmentIframe${SMOOBU_GROUP_ID}`
+}
+
+function initWidget(villaId?: string) {
+  if (typeof window === 'undefined') return
+  // @ts-expect-error: BookingToolIframe injected by Smoobu script
+  if (!window.BookingToolIframe) return
+  const containerId = buildContainerId(villaId)
+  // @ts-expect-error
+  window.BookingToolIframe.initialize({
+    url: buildWidgetUrl(villaId),
+    baseUrl: 'https://login.smoobu.com',
+    target: `#${containerId}`,
+  })
 }
 
 export default function BookingWidget({ widgetId }: BookingWidgetProps = {}) {
-  const id = widgetId ?? SMOOBU_ALL_ID
+  const containerId = buildContainerId(widgetId)
   const initialized = useRef(false)
 
-  // Re-initialize on mount (handles client-side navigation where script is already loaded)
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
-
-    // Small delay to let the container render
-    const t = setTimeout(() => initWidget(id), 100)
+    const t = setTimeout(() => initWidget(widgetId), 100)
     return () => clearTimeout(t)
-  }, [id])
+  }, [widgetId])
 
   return (
     <div className="smoobu-widget-wrapper w-full min-h-[600px]">
-      <div id={`apartmentIframe-${id}`} />
+      <div id={containerId} />
       <Script
         src={SCRIPT_SRC}
         strategy="afterInteractive"
-        onLoad={() => initWidget(id)}
+        onLoad={() => initWidget(widgetId)}
       />
     </div>
   )

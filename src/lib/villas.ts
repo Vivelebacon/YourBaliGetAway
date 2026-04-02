@@ -1,18 +1,19 @@
 // ─────────────────────────────────────────────
 // Smoobu config
 // ─────────────────────────────────────────────
-export const SMOOBU_ALL_ID = '1690897'
+export const SMOOBU_GROUP_ID = '1690897'
 
-const SMOOBU_IDS: Record<string, string | null> = {
-  'bali-bliss': null,
-  'bali-blue-1': null,
-  'bali-blue-2': null,
-  'bali-green': null,
-  'bali-sol': null,
+const SMOOBU_IDS: Record<string, string> = {
+  'bali-bliss': '3241317',
+  'bali-blue-1': '3241322',
+  'bali-blue-2': '3241327',
+  'bali-green': '3241332',
+  'bali-sol': '3241337',
 }
 
+// Returns the per-villa apartment ID (used to build the widget URL)
 export function getSmoobuId(slug: string): string {
-  return SMOOBU_IDS[slug] ?? SMOOBU_ALL_ID
+  return SMOOBU_IDS[slug] ?? ''
 }
 
 // ─────────────────────────────────────────────
