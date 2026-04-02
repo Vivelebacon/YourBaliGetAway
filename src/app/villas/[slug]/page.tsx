@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!villa) return {}
   return {
     title: `${villa.name} — ${villa.subtitle} | YBG Villas`,
-    description: villa.description,
+    description: villa.description.slice(0, 160),
   }
 }
 
@@ -33,17 +33,11 @@ export default async function VillaPage({ params }: Props) {
 
   const widgetId = getSmoobuId(slug)
   const base = `/images/${slug}`
-
-  // Hero: first exterior image, fallback to first image
-  const hero =
-    villa.images.find((i) => i.category === 'Exterior') ??
-    villa.images[0]
-
-  // Gallery: all images from the villa's image list
-  const gallery = villa.images
-
-  // Other villas for "You might also like"
+  const hero = villa.images.find((i) => i.category === 'Exterior') ?? villa.images[0]
   const others = villas.filter((v) => v.slug !== slug).slice(0, 3)
+
+  // Render description paragraphs
+  const descParagraphs = villa.description.split('\n\n').filter(Boolean)
 
   return (
     <div className="min-h-screen bg-villa-cream">
@@ -51,34 +45,28 @@ export default async function VillaPage({ params }: Props) {
 
       {/* ── Hero ── */}
       <section className="relative h-[80vh]">
-        <Image
-          src={`${base}/${hero.path}`}
-          alt={`${villa.name} — ${hero.category}`}
-          fill
-          className="object-cover"
-          priority
-        />
+        <Image src={`${base}/${hero.path}`} alt={`${villa.name}`} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pt-16">
           <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">YBG Villas</p>
-          <h1 className="font-serif text-5xl md:text-7xl text-white font-light mb-3">
-            {villa.name}
-          </h1>
+          <h1 className="font-serif text-5xl md:text-7xl text-white font-light mb-3">{villa.name}</h1>
           <p className="text-stone-200 text-lg font-light">{villa.subtitle}</p>
-          <div className="flex flex-wrap justify-center gap-2 mt-6">
+          {/* Rating */}
+          <div className="flex items-center gap-2 mt-4 text-white/80 text-sm">
+            <span className="text-villa-gold">★</span>
+            <span>{villa.rating}</span>
+            <span className="text-white/40">·</span>
+            <span>{villa.reviewCount} reviews</span>
+          </div>
+          <div className="flex flex-wrap justify-center gap-2 mt-5">
             {villa.highlights.map((h) => (
-              <span
-                key={h}
-                className="bg-white/15 backdrop-blur-sm text-white text-sm px-4 py-1.5 rounded-full border border-white/30"
-              >
-                {h}
-              </span>
+              <span key={h} className="bg-white/15 backdrop-blur-sm text-white text-sm px-4 py-1.5 rounded-full border border-white/30">{h}</span>
             ))}
           </div>
         </div>
       </section>
 
-      {/* ── Stats + description ── */}
+      {/* ── Stats + Description ── */}
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div>
@@ -87,74 +75,94 @@ export default async function VillaPage({ params }: Props) {
               <Stat label="Bathrooms" value={String(villa.bathrooms)} />
               <Stat label="Guests" value={`Up to ${villa.guests}`} />
             </div>
-            <p className="text-stone-600 leading-relaxed text-lg font-light">{villa.description}</p>
+            <div className="space-y-4">
+              {descParagraphs.map((p, i) => (
+                <p key={i} className="text-stone-600 leading-relaxed font-light">{p}</p>
+              ))}
+            </div>
           </div>
 
+          {/* Amenities */}
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <h3 className="font-serif text-2xl text-villa-dark mb-5">What&apos;s Included</h3>
-            <ul className="grid grid-cols-2 gap-3">
-              {[...villa.highlights, 'Air Conditioning', 'WiFi', 'Daily Housekeeping']
-                .filter((v, i, a) => a.indexOf(v) === i) // dedupe
-                .map((h) => (
-                  <li key={h} className="flex items-center gap-2 text-sm text-stone-600">
-                    <span className="w-1.5 h-1.5 rounded-full bg-villa-gold flex-shrink-0" />
-                    {h}
-                  </li>
-                ))}
+            <h3 className="font-serif text-2xl text-villa-dark mb-5">Amenities</h3>
+            <ul className="grid grid-cols-1 gap-3">
+              {villa.amenities.map((a) => (
+                <li key={a} className="flex items-center gap-3 text-sm text-stone-600">
+                  <span className="w-1.5 h-1.5 rounded-full bg-villa-gold flex-shrink-0" />
+                  {a}
+                </li>
+              ))}
             </ul>
           </div>
         </div>
       </section>
 
-      {/* ── Photo Gallery with lightbox ── */}
+      {/* ── Gallery ── */}
       <section className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-3xl text-villa-dark mb-8">Gallery</h2>
-          <Gallery slug={slug} images={gallery} />
+          <Gallery slug={slug} images={villa.images} />
+        </div>
+      </section>
+
+      {/* ── Reviews ── */}
+      <section className="bg-white py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="flex items-baseline gap-4 mb-10">
+            <h2 className="font-serif text-3xl text-villa-dark">Guest Reviews</h2>
+            <span className="text-villa-gold text-lg">★ {villa.rating}</span>
+            <span className="text-stone-400 text-sm">({villa.reviewCount} reviews on Airbnb)</span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {villa.reviews.map((r) => (
+              <div key={r.name} className="bg-villa-cream rounded-xl p-6">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-9 h-9 rounded-full bg-villa-green flex items-center justify-center text-white font-medium text-sm">
+                    {r.name[0]}
+                  </div>
+                  <div>
+                    <p className="font-medium text-villa-dark text-sm">{r.name}</p>
+                    <div className="flex gap-0.5 mt-0.5">
+                      {[...Array(5)].map((_, i) => <span key={i} className="text-villa-gold text-xs">★</span>)}
+                    </div>
+                  </div>
+                </div>
+                <p className="text-stone-600 text-sm leading-relaxed italic">&ldquo;{r.text}&rdquo;</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── Booking Widget ── */}
-      <section id="book" className="bg-white py-20 px-6">
+      <section id="book" className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
-            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">
-              Reserve {villa.name}
-            </h2>
-            <p className="text-stone-500 text-sm">
-              Real-time availability. No double bookings. Best rate guaranteed.
-            </p>
+            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
+            <p className="text-stone-500 text-sm">Real-time availability. No double bookings. Best rate guaranteed.</p>
           </div>
           <BookingWidget widgetId={widgetId} />
         </div>
       </section>
 
       {/* ── Other Villas ── */}
-      <section className="py-20 px-6">
+      <section className="bg-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-3xl text-villa-dark mb-10">You Might Also Like</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {others.map((v) => (
-              <Link
-                key={v.slug}
-                href={`/villas/${v.slug}`}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all"
-              >
+              <Link key={v.slug} href={`/villas/${v.slug}`} className="group bg-villa-cream rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
                 <div className="relative h-48 overflow-hidden">
-                  <Image
-                    src={`/images/${v.slug}/${v.coverImage}`}
-                    alt={v.name}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
+                  <Image src={`/images/${v.slug}/${v.coverImage}`} alt={v.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-serif text-xl text-villa-dark">{v.name}</h3>
-                  <p className="text-villa-muted text-sm mt-1">{v.subtitle}</p>
-                  <span className="text-villa-green text-sm mt-3 inline-block group-hover:underline">
-                    View Villa →
-                  </span>
+                  <div className="flex items-center justify-between mb-1">
+                    <h3 className="font-serif text-xl text-villa-dark">{v.name}</h3>
+                    <span className="text-villa-gold text-sm">★ {v.rating}</span>
+                  </div>
+                  <p className="text-villa-muted text-sm">{v.subtitle}</p>
+                  <span className="text-villa-green text-sm mt-3 inline-block group-hover:underline">View Villa →</span>
                 </div>
               </Link>
             ))}
@@ -163,9 +171,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       <div className="text-center py-8">
-        <Link href="/" className="text-villa-muted text-sm hover:text-villa-green transition-colors">
-          ← Back to all villas
-        </Link>
+        <Link href="/" className="text-villa-muted text-sm hover:text-villa-green transition-colors">← Back to all villas</Link>
       </div>
 
       <Footer />

@@ -94,7 +94,10 @@ export default function HomeClient() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="font-serif text-2xl text-villa-dark mb-1">{villa.name}</h3>
+                  <div className="flex items-start justify-between mb-1">
+                    <h3 className="font-serif text-2xl text-villa-dark">{villa.name}</h3>
+                    <span className="text-villa-gold text-sm flex items-center gap-1">★ {villa.rating}</span>
+                  </div>
                   <p className="text-villa-muted text-sm mb-4">{villa.subtitle}</p>
                   <div className="flex items-center gap-4 text-sm text-villa-muted mb-5">
                     <span className="flex items-center gap-1"><BedIcon /> {villa.bedrooms} BR</span>
