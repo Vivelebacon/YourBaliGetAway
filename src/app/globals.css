@@ -1,0 +1,30 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  --font-cormorant: 'Cormorant Garamond', Georgia, serif;
+  --font-inter: 'Inter', system-ui, sans-serif;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-inter);
+  background-color: #FAF7F2;
+  color: #1A1A1A;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-cormorant);
+}
+
+/* Smoobu widget container */
+.smoobu-widget-wrapper iframe {
+  width: 100% !important;
+  border: none;
+}
