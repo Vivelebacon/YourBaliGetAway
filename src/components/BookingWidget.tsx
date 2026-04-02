@@ -16,7 +16,7 @@ export default function BookingWidget() {
         onLoad={() => {
           // @ts-expect-error: BookingToolIframe injected by Smoobu script
           window.BookingToolIframe.initialize({
-            url: 'https://login.smoobu.com/en/booking-tool/iframe/1690897',
+            url: 'https://login.smoobu.com/en/booking-tool/iframe/1690897?locale=en_US',
             baseUrl: 'https://login.smoobu.com',
             target: '#apartmentIframeAll',
           })
