@@ -14,8 +14,8 @@ export default function Navbar() {
           <Image
             src="/logo.jpeg"
             alt="YBG Villas"
-            width={56}
-            height={56}
+            width={72}
+            height={72}
             className="rounded-full object-cover"
           />
         </Link>
@@ -32,7 +32,7 @@ export default function Navbar() {
             Contact
           </Link>
           <a
-            href="https://wa.me/message/YOURLINK"
+            href="https://wa.me/6282221762980"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-villa-green text-white text-sm px-5 py-2 rounded-full hover:bg-villa-green-light transition-colors"
@@ -58,7 +58,7 @@ export default function Navbar() {
           <Link href="/#book" onClick={() => setOpen(false)} className="text-villa-dark hover:text-villa-green">Book</Link>
           <Link href="/#contact" onClick={() => setOpen(false)} className="text-villa-dark hover:text-villa-green">Contact</Link>
           <a
-            href="https://wa.me/message/YOURLINK"
+            href="https://wa.me/6282221762980"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-villa-green text-white text-center px-5 py-2 rounded-full"
