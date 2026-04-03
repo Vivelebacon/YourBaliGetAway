@@ -33,7 +33,7 @@ export default async function VillaPage({ params }: Props) {
 
   const widgetId = getSmoobuId(slug)
   const base = `/images/${slug}`
-  const hero = villa.images.find((i) => i.category === 'Exterior') ?? villa.images[0]
+  const hero = { path: villa.coverImage, category: 'Pool', label: 'Pool' }
   const others = villas.filter((v) => v.slug !== slug).slice(0, 3)
 
   // Render description paragraphs
