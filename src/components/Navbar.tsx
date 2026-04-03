@@ -14,8 +14,8 @@ export default function Navbar() {
           <Image
             src="/logo.jpeg"
             alt="YBG Villas"
-            width={72}
-            height={72}
+            width={48}
+            height={48}
             className="rounded-full object-cover"
           />
         </Link>
