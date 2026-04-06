@@ -216,8 +216,9 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       { name: 'Monica', text: 'We had a wonderful stay at this villa. The place is beautiful, spacious, and very well maintained. The design is lovely and comfortable. Overall, it was such a relaxing and pleasant experience.' },
       { name: 'Umesh', text: 'Joel and his team are great. Lots of food joints at walking distance. Overall great place, great host.' },
     ],
-    coverImage: 'Pool/Pool_01.jpeg',
+    coverImage: 'Living Room/Living Room_02.jpeg',
     images: [
+      ...imgs('Living Room', ['Living Room_02.jpeg','Living Room_01.jpeg','Living Room_03.jpeg']),
       ...imgs('Pool', ['Pool_01.jpeg','Pool_05.jpeg','Pool_06.jpeg','Pool_02.jpeg','Pool_03.jpeg','Pool_04.jpeg']),
       ...imgs('Exterior', ['Exterior_01.png','Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg','Exterior_06.jpeg']),
       ...imgs('Cinema', ['Cinema_01.jpeg','Cinema_02.jpeg','Cinema_03.png','Cinema_04.jpeg']),
@@ -225,7 +226,6 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       ...imgs('Games', ['Games_03.jpeg']),
       ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpeg','Bedroom 1_03.jpeg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg','Bedroom 1_08.jpeg']),
       ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg','Bedroom 2_05.jpeg','Bedroom 2_07.jpeg','Bedroom 2_09.jpeg','Bedroom 2_10.jpeg','Bedroom 2_11.jpeg','Bedroom 2_12.jpeg']),
-      ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg']),
       ...imgs('Dining Area', ['Dining Area_01.jpeg','Dining Area_02.jpeg','Dining Area_03.jpeg','Dining Area_04.jpeg','Dining Area_05.jpeg','Dining Area_06.jpeg']),
       ...imgs('Bathroom 1', ['Bathroom 1_01.jpeg','Bathroom 1_02.jpeg']),
