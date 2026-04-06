@@ -248,14 +248,20 @@ With modern amenities, stylish decor, and thoughtful details — including a lus
     ],
     coverImage: 'Exterior/Exterior_01.jpeg',
     images: [
-      ...imgs('Exterior', ['Exterior_01.jpeg']),
-      ...imgs('Pool', ['Pool_01.jpeg']),
+      ...imgs('Exterior', ['Exterior_01.jpeg', 'Exterior_02.png'], [
+        'Welcome to Bali Blue 2! The entrance to your private tropical villa awaits.',
+        'Lush greenery surrounds the villa, creating a peaceful and serene atmosphere in the heart of Seminyak.',
+      ]),
+      ...imgs('Pool', ['Pool_01.jpeg'], [
+        'Take a refreshing dip in the private pool, surrounded by tropical garden views and comfortable loungers.',
+      ]),
+      ...imgs('Living Room', ['Living Room_01.jpg'], [
+        'The spacious living room opens onto the garden and pool area, featuring a Smart TV and comfortable seating for the whole group.',
+      ]),
       ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg'], [
         'Relax in this beautiful bedroom featuring a king-size bed, air conditioning, and a 43-inch Smart TV. You\'ll have direct access to the pool lounge, perfect for unwinding by the water. The en-suite bathroom offers comfort and privacy.',
         'This serene bedroom opens to the pool and lush garden, featuring a Smart TV with Netflix, blackout curtains, a workspace with a desk, and a full-length mirror. The king bed ensures comfort, making it perfect for both relaxation and entertainment.',
       ]),
-      ...imgs('Living Room', ['Living Room_01.jpg']),
-      ...imgs('Exterior', ['Exterior_02.png']),
     ],
   },
   {
