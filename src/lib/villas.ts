@@ -200,9 +200,9 @@ Located near Double Six Beach and Seminyak's best dining and nightlife, Bali Gre
       { name: 'Yvonne', text: 'Joel\'s Villa was nice and quiet with beautiful gardens and in a great location, very easy to get around.' },
       { name: 'Jasmin', text: 'We had a great stay! Bali Green was clean, comfortable, and exactly as described.' },
     ],
-    coverImage: 'Pool/Pool_01.jpeg',
+    coverImage: 'Living Room/Living Room_01.jpeg',
     images: [
-      ...imgs('Pool', ['Pool_01.jpeg']),
+      ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Garden', ['Garden_01.jpeg','Garden_02.jpeg']),
       ...imgs('Exterior', ['Exterior_01.jpeg','Exterior_02.jpeg']),
       ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg','Bedroom_03.jpeg','Bedroom_04.jpeg','Bedroom_05.jpeg','Bedroom_06.jpeg','Bedroom_07.jpeg','Bedroom_08.jpeg','Bedroom_09.jpeg','Bedroom_10.jpeg','Bedroom_11.jpeg','Bedroom_12.jpeg','Bedroom_13.jpeg'], [
@@ -211,7 +211,6 @@ Located near Double Six Beach and Seminyak's best dining and nightlife, Bali Gre
         'Bedroom 3 — air-conditioned with a comfortable bed and wardrobe.',
         'Bedroom 4 — air-conditioned with a comfortable bed and wardrobe.',
       ]),
-      ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg']),
       ...imgs('Bathroom', ['Bathroom_01.jpeg','Bathroom_02.jpeg','Bathroom_03.jpeg','Bathroom_04.jpeg','Bathroom_05.jpeg','Bathroom_06.jpeg','Bathroom_07.jpeg','Bathroom_08.jpeg']),
     ],
@@ -239,25 +238,24 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       { name: 'Monica', text: 'We had a wonderful stay at this villa. The place is beautiful, spacious, and very well maintained. The design is lovely and comfortable. Overall, it was such a relaxing and pleasant experience.' },
       { name: 'Umesh', text: 'Joel and his team are great. Lots of food joints at walking distance. Overall great place, great host.' },
     ],
-    coverImage: 'Pool/Pool_01.jpeg',
+    coverImage: 'Living Room/Living Room_02.jpeg',
     images: [
+      ...imgs('Living Room', ['Living Room_02.jpeg','Living Room_01.jpeg','Living Room_03.jpeg']),
       ...imgs('Pool', ['Pool_01.jpeg','Pool_05.jpeg','Pool_06.jpeg','Pool_02.jpeg','Pool_03.jpeg','Pool_04.jpeg']),
-      ...imgs('Exterior', ['Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg','Exterior_05.jpeg','Exterior_06.jpeg','Exterior_01.png']),
+      ...imgs('Exterior', ['Exterior_01.png','Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg','Exterior_06.jpeg']),
       ...imgs('Cinema', ['Cinema_01.jpeg','Cinema_02.jpeg','Cinema_03.png','Cinema_04.jpeg']),
-      ...imgs('Bar', ['Bar_01.jpeg']),
-      ...imgs('Games', ['Games_01.jpeg','Games_02.jpeg','Games_03.jpeg']),
-      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpeg','Bedroom 1_03.jpeg','Bedroom 1_04.jpeg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg'], [
+      ...imgs('Bar', ['Bar_02.jpeg']),
+      ...imgs('Games', ['Games_03.jpeg']),
+      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpeg','Bedroom 1_03.jpeg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg','Bedroom 1_08.jpeg'], [
         'Spacious 35 m² bedroom with 1.5 AC, king-size bed, blackout curtains, Smart TV with streaming, safe, iron and board, and dedicated workspace. Sliding doors open to the pool and garden, with access to the ensuite bathroom for comfort and convenience.',
       ]),
-      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg','Bedroom 2_04.jpeg','Bedroom 2_05.jpeg','Bedroom 2_06.jpeg','Bedroom 2_07.jpeg','Bedroom 2_08.jpeg','Bedroom 2_09.jpeg','Bedroom 2_10.jpeg','Bedroom 2_11.jpeg','Bedroom 2_12.jpeg'], [
+      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg','Bedroom 2_05.jpeg','Bedroom 2_07.jpeg','Bedroom 2_09.jpeg','Bedroom 2_10.jpeg','Bedroom 2_11.jpeg','Bedroom 2_12.jpeg'], [
         'Bedroom 2 featuring a king-size bed, smart TV, blackout curtains, and direct access to the poolside terrace — ideal for couples or solo travelers who enjoy extra space and comfort.',
       ]),
-      ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg']),
       ...imgs('Dining Area', ['Dining Area_01.jpeg','Dining Area_02.jpeg','Dining Area_03.jpeg','Dining Area_04.jpeg','Dining Area_05.jpeg','Dining Area_06.jpeg']),
       ...imgs('Bathroom 1', ['Bathroom 1_01.jpeg','Bathroom 1_02.jpeg']),
       ...imgs('Bathroom 2', ['Bathroom 2_01.jpeg','Bathroom 2_02.jpeg','Bathroom 2_03.jpeg','Bathroom 2_04.jpeg']),
-      ...imgs('Garden', ['Garden_01.jpeg']),
     ],
   },
 ]
