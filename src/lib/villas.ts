@@ -23,6 +23,7 @@ export interface VillaImage {
   path: string
   category: string
   label: string
+  caption?: string
 }
 
 export interface VillaReview {
@@ -50,8 +51,13 @@ export interface Villa {
 // ─────────────────────────────────────────────
 // Helper
 // ─────────────────────────────────────────────
-function imgs(category: string, files: string[]): VillaImage[] {
-  return files.map((f) => ({ path: `${category}/${f}`, category, label: category }))
+function imgs(category: string, files: string[], captions: string[] = []): VillaImage[] {
+  return files.map((f, i) => ({
+    path: `${category}/${f}`,
+    category,
+    label: category,
+    ...(captions[i] ? { caption: captions[i] } : {}),
+  }))
 }
 
 // ─────────────────────────────────────────────
@@ -85,8 +91,12 @@ The fully equipped kitchen includes a 4-person island bar, stove, fridge-freezer
     images: [
       ...imgs('Pool', ['Pool_06.jpeg','Pool_05.jpeg','Pool_01.jpg','Pool_02.jpg','Pool_07.jpeg','Pool_08.jpeg','Pool_03.jpeg','Pool_04.jpeg','Pool_09.jpeg']),
       ...imgs('Exterior', ['Exterior_01.jpg']),
-      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpg','Bedroom 1_03.jpeg','Bedroom 1_04.jpg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg']),
-      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg']),
+      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpg','Bedroom 1_03.jpeg','Bedroom 1_04.jpg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg'], [
+        'This serene bedroom features a king-sized bed, a 43" smart TV with streaming and cable, blackout curtains for restful sleep, and an ensuite bathroom. Floor-to-ceiling glass doors open to the lush garden and private pool.',
+      ]),
+      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg'], [
+        'After a long day enjoying Bali\'s beaches or relaxing by our pool, this room is your perfect retreat. It features a king-size bed, TV, luggage space, air conditioning, and windows opening to the pool and garden.',
+      ]),
       ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpg','Living Room_03.jpeg','Living Room_04.jpeg','Living Room_05.jpeg','Living Room_06.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg']),
       ...imgs('Dining Area', ['Dining Area_01.jpg','Dining Area_02.jpeg','Dining Area_03.jpg']),
@@ -121,8 +131,13 @@ This well-appointed villa will undoubtedly leave you wanting more.`,
     images: [
       ...imgs('Pool', ['Pool_05.jpeg','Pool_02.jpeg','Pool_01.jpeg','Pool_04.jpeg','Pool_09.jpeg','Pool_07.jpeg','Pool_06.jpeg','Pool_10.jpeg','Pool_11.jpeg','Pool_12.jpeg','Pool_08.jpeg','Pool_03.jpeg']),
       ...imgs('Exterior', ['Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg']),
-      ...imgs('Bedroom 1 (Master)', ['Bedroom 1 (Master)_01.jpeg','Bedroom 1 (Master)_02.jpeg','Bedroom 1 (Master)_03.jpeg']),
-      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg','Bedroom_03.jpeg','Bedroom_04.jpeg']),
+      ...imgs('Bedroom 1 (Master)', ['Bedroom 1 (Master)_01.jpeg','Bedroom 1 (Master)_02.jpeg','Bedroom 1 (Master)_03.jpeg'], [
+        '',
+        'Relax in this beautifully designed bedroom featuring a king-size bed, air conditioning, and a spacious wardrobe with a safe for your valuables. You\'ll also have direct access to the pool lounge. The en-suite bathroom offers added comfort and privacy.',
+      ]),
+      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg','Bedroom_03.jpeg','Bedroom_04.jpeg'], [
+        'This inviting bedroom features air conditioning, a TV, and a wardrobe. Enjoy decorative mood lighting, while direct access to the en-suite bathroom ensures convenience. Step outside to the poolside gazebo bed or take a dip in the pool.',
+      ]),
       ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg','Kitchen_06.jpeg','Kitchen_07.jpeg']),
       ...imgs('Dining Area', ['Dining Area_01.jpeg','Dining Area_02.jpeg']),
@@ -154,7 +169,10 @@ With modern amenities, stylish decor, and thoughtful details — including a lus
     images: [
       ...imgs('Exterior', ['Exterior_01.jpeg']),
       ...imgs('Pool', ['Pool_01.jpeg']),
-      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg']),
+      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg'], [
+        'Relax in this beautiful bedroom featuring a king-size bed, air conditioning, and a 43-inch Smart TV. You\'ll have direct access to the pool lounge, perfect for unwinding by the water. The en-suite bathroom offers comfort and privacy.',
+        'This serene bedroom opens to the pool and lush garden, featuring a Smart TV with Netflix, blackout curtains, a workspace with a desk, and a full-length mirror.',
+      ]),
       ...imgs('Living Room', ['Living Room_01.jpg']),
       ...imgs('Exterior', ['Exterior_02.png']),
     ],
@@ -187,7 +205,12 @@ Located near Double Six Beach and Seminyak's best dining and nightlife, Bali Gre
       ...imgs('Pool', ['Pool_01.jpeg']),
       ...imgs('Garden', ['Garden_01.jpeg','Garden_02.jpeg']),
       ...imgs('Exterior', ['Exterior_01.jpeg','Exterior_02.jpeg']),
-      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg','Bedroom_03.jpeg','Bedroom_04.jpeg','Bedroom_05.jpeg','Bedroom_06.jpeg','Bedroom_07.jpeg','Bedroom_08.jpeg','Bedroom_09.jpeg','Bedroom_10.jpeg','Bedroom_11.jpeg','Bedroom_12.jpeg','Bedroom_13.jpeg']),
+      ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg','Bedroom_03.jpeg','Bedroom_04.jpeg','Bedroom_05.jpeg','Bedroom_06.jpeg','Bedroom_07.jpeg','Bedroom_08.jpeg','Bedroom_09.jpeg','Bedroom_10.jpeg','Bedroom_11.jpeg','Bedroom_12.jpeg','Bedroom_13.jpeg'], [
+        'This air-conditioned master bedroom offers a 43-inch smart TV with cable and streaming, a pool view, and ensuite bathroom. It features bedside tables with lamps, a footboard bench, and curtains for privacy, creating a serene and comfortable retreat.',
+        'With direct access to a private patio, Bedroom 2 offers air-conditioning, a queen bed, and a 43-inch smart TV. The serene design is complemented by an ensuite bathroom for ultimate convenience and relaxation.',
+        'Bedroom 3 — air-conditioned with a comfortable bed and wardrobe.',
+        'Bedroom 4 — air-conditioned with a comfortable bed and wardrobe.',
+      ]),
       ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg']),
       ...imgs('Bathroom', ['Bathroom_01.jpeg','Bathroom_02.jpeg','Bathroom_03.jpeg','Bathroom_04.jpeg','Bathroom_05.jpeg','Bathroom_06.jpeg','Bathroom_07.jpeg','Bathroom_08.jpeg']),
@@ -223,8 +246,12 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       ...imgs('Cinema', ['Cinema_01.jpeg','Cinema_02.jpeg','Cinema_03.png','Cinema_04.jpeg']),
       ...imgs('Bar', ['Bar_01.jpeg']),
       ...imgs('Games', ['Games_01.jpeg','Games_02.jpeg','Games_03.jpeg']),
-      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpeg','Bedroom 1_03.jpeg','Bedroom 1_04.jpeg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg']),
-      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg','Bedroom 2_04.jpeg','Bedroom 2_05.jpeg','Bedroom 2_06.jpeg','Bedroom 2_07.jpeg','Bedroom 2_08.jpeg','Bedroom 2_09.jpeg','Bedroom 2_10.jpeg','Bedroom 2_11.jpeg','Bedroom 2_12.jpeg']),
+      ...imgs('Bedroom 1', ['Bedroom 1_01.jpeg','Bedroom 1_02.jpeg','Bedroom 1_03.jpeg','Bedroom 1_04.jpeg','Bedroom 1_05.jpeg','Bedroom 1_06.jpeg','Bedroom 1_07.jpeg'], [
+        'Spacious 35 m² bedroom with 1.5 AC, king-size bed, blackout curtains, Smart TV with streaming, safe, iron and board, and dedicated workspace. Sliding doors open to the pool and garden, with access to the ensuite bathroom for comfort and convenience.',
+      ]),
+      ...imgs('Bedroom 2', ['Bedroom 2_01.jpeg','Bedroom 2_02.jpeg','Bedroom 2_03.jpeg','Bedroom 2_04.jpeg','Bedroom 2_05.jpeg','Bedroom 2_06.jpeg','Bedroom 2_07.jpeg','Bedroom 2_08.jpeg','Bedroom 2_09.jpeg','Bedroom 2_10.jpeg','Bedroom 2_11.jpeg','Bedroom 2_12.jpeg'], [
+        'Bedroom 2 featuring a king-size bed, smart TV, blackout curtains, and direct access to the poolside terrace — ideal for couples or solo travelers who enjoy extra space and comfort.',
+      ]),
       ...imgs('Living Room', ['Living Room_01.jpeg','Living Room_02.jpeg','Living Room_03.jpeg','Living Room_04.jpeg']),
       ...imgs('Kitchen', ['Kitchen_01.jpeg','Kitchen_02.jpeg','Kitchen_03.jpeg','Kitchen_04.jpeg','Kitchen_05.jpeg']),
       ...imgs('Dining Area', ['Dining Area_01.jpeg','Dining Area_02.jpeg','Dining Area_03.jpeg','Dining Area_04.jpeg','Dining Area_05.jpeg','Dining Area_06.jpeg']),

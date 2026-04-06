@@ -120,10 +120,15 @@ export default function Gallery({ slug, images }: GalleryProps) {
               className="w-full h-full object-contain max-h-[85vh]"
               priority
             />
-            {/* Category label */}
+            {/* Category label + caption */}
             <p className="text-center text-white/50 text-xs mt-3 tracking-widest uppercase">
               {current.category}
             </p>
+            {current.caption && (
+              <p className="text-center text-white/75 text-sm mt-2 max-w-2xl mx-auto leading-relaxed">
+                {current.caption}
+              </p>
+            )}
           </div>
 
           {/* Next */}
