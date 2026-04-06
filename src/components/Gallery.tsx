@@ -107,9 +107,9 @@ export default function Gallery({ slug, images }: GalleryProps) {
             </svg>
           </button>
 
-          {/* Image */}
+          {/* Image + caption */}
           <div
-            className="relative max-w-5xl max-h-[85vh] w-full mx-16"
+            className="flex flex-col items-center w-full mx-16 max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -117,18 +117,20 @@ export default function Gallery({ slug, images }: GalleryProps) {
               alt={current.label}
               width={1400}
               height={900}
-              className="w-full h-full object-contain max-h-[85vh]"
+              className="w-full object-contain max-h-[72vh]"
               priority
             />
-            {/* Category label + caption */}
-            <p className="text-center text-white/50 text-xs mt-3 tracking-widest uppercase">
-              {current.category}
-            </p>
-            {current.caption && (
-              <p className="text-center text-white/75 text-sm mt-2 max-w-2xl mx-auto leading-relaxed">
-                {current.caption}
+            {/* Category + caption bar — always visible below image */}
+            <div className="w-full text-center pt-3 pb-1">
+              <p className="text-white/40 text-xs tracking-widest uppercase mb-1">
+                {current.category}
               </p>
-            )}
+              {current.caption && (
+                <p className="text-white/85 text-sm leading-relaxed max-w-2xl mx-auto">
+                  {current.caption}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Next */}

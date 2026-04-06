@@ -171,7 +171,7 @@ With modern amenities, stylish decor, and thoughtful details — including a lus
       ...imgs('Pool', ['Pool_01.jpeg']),
       ...imgs('Bedroom', ['Bedroom_01.jpeg','Bedroom_02.jpeg'], [
         'Relax in this beautiful bedroom featuring a king-size bed, air conditioning, and a 43-inch Smart TV. You\'ll have direct access to the pool lounge, perfect for unwinding by the water. The en-suite bathroom offers comfort and privacy.',
-        'This serene bedroom opens to the pool and lush garden, featuring a Smart TV with Netflix, blackout curtains, a workspace with a desk, and a full-length mirror.',
+        'This serene bedroom opens to the pool and lush garden, featuring a Smart TV with Netflix, blackout curtains, a workspace with a desk, and a full-length mirror. The king bed ensures comfort, making it perfect for both relaxation and entertainment.',
       ]),
       ...imgs('Living Room', ['Living Room_01.jpg']),
       ...imgs('Exterior', ['Exterior_02.png']),
