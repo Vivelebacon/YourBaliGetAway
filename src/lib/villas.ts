@@ -216,10 +216,10 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       { name: 'Monica', text: 'We had a wonderful stay at this villa. The place is beautiful, spacious, and very well maintained. The design is lovely and comfortable. Overall, it was such a relaxing and pleasant experience.' },
       { name: 'Umesh', text: 'Joel and his team are great. Lots of food joints at walking distance. Overall great place, great host.' },
     ],
-    coverImage: 'Pool/Pool_01.jpeg',
+    coverImage: 'Exterior/Exterior_01.png',
     images: [
+      ...imgs('Exterior', ['Exterior_01.png','Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg','Exterior_06.jpeg']),
       ...imgs('Pool', ['Pool_01.jpeg','Pool_05.jpeg','Pool_06.jpeg','Pool_02.jpeg','Pool_03.jpeg','Pool_04.jpeg']),
-      ...imgs('Exterior', ['Exterior_02.jpeg','Exterior_03.jpeg','Exterior_04.jpeg','Exterior_06.jpeg','Exterior_01.png']),
       ...imgs('Cinema', ['Cinema_01.jpeg','Cinema_02.jpeg','Cinema_03.png','Cinema_04.jpeg']),
       ...imgs('Bar', ['Bar_02.jpeg']),
       ...imgs('Games', ['Games_03.jpeg']),
