@@ -87,7 +87,7 @@ The fully equipped kitchen includes a 4-person island bar, stove, fridge-freezer
       { name: 'Since', text: `Everything was clean, comfortable, and exactly as described. The villa had such a relaxing vibe and felt like the perfect getaway. Joel was a great host, and special thanks to his co-host, Dewa.` },
       { name: 'Ericka', text: `Very amazing place, very clean, very friendly and very helpful hosts. We regretted checking in late because the villa was very comfortable.` }
     ],
-    coverImage: 'Pool/Pool_01.jpg',
+    coverImage: 'main.jpg',
     images: [
       ...imgs('Living Room', ['Living Room_01.jpg', 'Living Room_02.jpg', 'Living Room_03.jpg', 'Living Room_04.jpg'], [
         'Bright open-plan living and dining area by the pool, with sofa and new bright blue cushions, wooden dining table and stools, compact kitchen, ceiling fan, and Smart TV. Large curtains bring in natural light and provide shade and privacy.',
@@ -185,7 +185,7 @@ This well-appointed villa will undoubtedly leave you wanting more.`,
       { name: 'Mohamed', text: `My wife and I stayed for 5 days in Villa Bali Blue. Villa was as described in photos, clean, private and close to restaurants and beaches.` },
       { name: 'Nur Syahira', text: `Thank you to Pak Dewa who waited for me until 2am to show me the villa because my flight was delayed. Very responsive and friendly host.` }
     ],
-    coverImage: 'Pool/Pool_01.jpg',
+    coverImage: 'main.jpg',
     images: [
       ...imgs('Living Room', ['Living Room_01.jpg', 'Living Room_02.jpg', 'Living Room_03.jpg', 'Living Room_04.jpg', 'Living Room_05.jpg', 'Living Room_06.jpg'], [
         'This spacious living room offers a stunning pool view with plush couches, cushions, and a coffee table for a cozy vibe. Enjoy a smart TV with Bluetooth speaker, while floor-to-ceiling curtains provide privacy and keep the space peaceful and bug-free.',
@@ -279,7 +279,7 @@ With modern amenities, stylish decor, and thoughtful details \u2014 including a 
       { name: 'Vikram', text: `The host was very responsive and supportive throughout our stay. Any minor issues were resolved promptly.` },
       { name: 'Pratheesh', text: `Our stay was excellent thanks to the proactive and responsive host whose communication and empathy was top notch.` }
     ],
-    coverImage: 'Pool/Pool_01.jpg',
+    coverImage: 'main.jpg',
     images: [
       ...imgs('Living Room', ['Living Room_01.jpg', 'Living Room_02.jpg', 'Living Room_03.jpg'], [
         'Relax in this lounge with a stunning pool view, smart TV, and Bluetooth speaker. Enjoy the comfort of cozy couches, cushions, and a footrest. Floor-to-ceiling curtains provide privacy and keep out bugs, enhancing your relaxation.',
@@ -388,7 +388,7 @@ Located near Double Six Beach and Seminyak's best dining and nightlife, Bali Gre
       { name: 'Yvonne', text: `Joel's Villa was nice and quiet with beautiful gardens and in a great location, very easy to get around.` },
       { name: 'Jasmin', text: `We had a great stay! Bali Green was clean, comfortable, and exactly as described.` }
     ],
-    coverImage: 'Pool/Pool_01.jpg',
+    coverImage: 'main.jpg',
     images: [
       ...imgs('Living Room', ['Living Room_01.jpg', 'Living Room_02.jpg', 'Living Room_03.jpg'], [
         'Lounge doors closed for hot days and evenings with AC to cool the space',
@@ -485,7 +485,7 @@ The villa combines modern design with thoughtful extras, creating the perfect ge
       { name: 'Monica', text: `We had a wonderful stay at this villa. The place is beautiful, spacious, and very well maintained. The design is lovely and comfortable. Overall, it was such a relaxing and pleasant experience.` },
       { name: 'Umesh', text: `Joel and his team are great. Lots of food joints at walking distance. Overall great place, great host.` }
     ],
-    coverImage: 'Pool/Pool_01.jpg',
+    coverImage: 'main.jpg',
     images: [
       ...imgs('Living Room', ['Living Room_01.jpg', 'Living Room_02.jpg', 'Living Room_03.jpg', 'Living Room_04.jpg', 'Living Room_05.jpg', 'Living Room_06.jpg', 'Living Room_07.jpg', 'Living Room_08.jpg', 'Living Room_09.jpg', 'Living Room_10.jpg'], [
         'Spacious living room with two large sofas, four footrests, and vibrant décor—perfect for relaxing by day with garden views or transforming into your own private cinema and game room with darts, karaoke, and a retractable projector screen',
