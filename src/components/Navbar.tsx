@@ -2,13 +2,20 @@
 
 import Link from 'next/link'
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 80)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-transparent border-b border-white/10">
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-sm border-b border-stone-200' : 'bg-transparent border-b border-white/10'}`}>
       <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/">
           <Image
@@ -22,13 +29,13 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/#villas" className="text-sm text-white/90 hover:text-white transition-colors">
+          <Link href="/#villas" className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
             Our Villas
           </Link>
-          <Link href="/#book" className="text-sm text-white/90 hover:text-white transition-colors">
+          <Link href="/#book" className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
             Book
           </Link>
-          <Link href="/#contact" className="text-sm text-white/90 hover:text-white transition-colors">
+          <Link href="/#contact" className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
             Contact
           </Link>
           <a
@@ -44,9 +51,9 @@ export default function Navbar() {
         {/* Mobile menu button */}
         <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
           <div className="space-y-1.5">
-            <span className={`block w-6 h-0.5 bg-white transition-all ${open ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block w-6 h-0.5 bg-white transition-all ${open ? 'opacity-0' : ''}`} />
-            <span className={`block w-6 h-0.5 bg-white transition-all ${open ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? 'opacity-0' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? '-rotate-45 -translate-y-2' : ''}`} />
           </div>
         </button>
       </div>
