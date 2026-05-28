@@ -22,7 +22,6 @@ export default function HomeClient() {
         title="Your Bali Getaway"
         date="Bali, Indonesia"
         scrollToExpand="Scroll to explore"
-        textBlend
       />
 
 
