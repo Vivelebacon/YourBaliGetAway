@@ -312,14 +312,20 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-villa-gold [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none'
-                  style={{ transform: `translateX(-${textTranslateX}vw)` }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-cover bg-center [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
+                  style={{
+                    transform: `translateX(-${textTranslateX}vw)`,
+                    backgroundImage: "url('/logo_transparent.png')",
+                  }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-villa-gold [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none'
-                  style={{ transform: `translateX(${textTranslateX}vw)` }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-transparent bg-clip-text bg-cover bg-center [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
+                  style={{
+                    transform: `translateX(${textTranslateX}vw)`,
+                    backgroundImage: "url('/logo_transparent.png')",
+                  }}
                 >
                   {restOfTitle}
                 </motion.h2>
