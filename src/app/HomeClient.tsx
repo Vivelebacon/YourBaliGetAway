@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import BookingWidget from '@/components/BookingWidget'
 import ReviewCarousel from '@/components/ReviewCarousel'
+import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
 import { villas } from '@/lib/villas'
 
 export default function HomeClient() {
@@ -13,52 +14,17 @@ export default function HomeClient() {
     <div className="min-h-screen bg-villa-cream">
       <Navbar />
 
-      {/* ── Hero ── */}
-      <section className="relative h-screen">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="/hero.mp4" type="video/mp4" />
-        </video>
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6">
-          <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-4">Bali, Indonesia</p>
-          <h1 className="font-serif text-5xl md:text-7xl text-white font-light leading-tight mb-6">
-            Your Private Bali Escape
-          </h1>
-          <p className="text-stone-200 text-lg md:text-xl max-w-xl mb-10 font-light">
-            Five luxury pool villas. Book direct for the best rates.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="#villas"
-              className="bg-villa-gold text-villa-dark px-8 py-3 rounded-full font-medium hover:bg-yellow-400 transition-colors"
-            >
-              Explore Villas
-            </a>
-            <a
-              href="#book"
-              className="border border-white text-white px-8 py-3 rounded-full font-medium hover:bg-white/10 transition-colors"
-            >
-              Check Availability
-            </a>
-          </div>
-        </div>
-        <a
-          href="#villas"
-          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-white/70 hover:text-white transition-colors"
-          aria-label="Scroll down"
-        >
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
-          <svg className="w-6 h-6 animate-bounce mt-1" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
-          </svg>
-        </a>
-      </section>
+      {/* ── Hero (scroll-expand) ── */}
+      <ScrollExpandMedia
+        mediaType="video"
+        mediaSrc="/hero.mp4"
+        bgImageSrc="/hero1.jpg"
+        title="Your Private Bali Escape"
+        date="Bali, Indonesia"
+        scrollToExpand="Scroll to explore"
+        textBlend
+      />
+
 
       {/* ── Villa Collection ── */}
       <section id="villas" className="py-24 px-6">
