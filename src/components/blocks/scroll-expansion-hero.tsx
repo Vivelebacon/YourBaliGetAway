@@ -167,6 +167,20 @@ const ScrollExpandMedia = ({
   const firstWord = title ? title.split(' ')[0] : '';
   const restOfTitle = title ? title.split(' ').slice(1).join(' ') : '';
 
+  const sunsetGradient =
+    'linear-gradient(180deg, #FFB300 0%, #FF6B1A 28%, #B22222 55%, #2D5016 80%, #0F2A0F 100%)';
+
+  const renderColoredText = (text: string) =>
+    text.split('').map((ch, i) => (
+      <span
+        key={i}
+        className='inline-block bg-clip-text text-transparent bg-cover bg-center'
+        style={{ backgroundImage: sunsetGradient }}
+      >
+        {ch === ' ' ? ' ' : ch}
+      </span>
+    ));
+
   return (
     <div
       ref={sectionRef}
@@ -312,22 +326,16 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-cover bg-center [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
-                  style={{
-                    transform: `translateX(-${textTranslateX}vw)`,
-                    backgroundImage: "url('/logo_transparent.png')",
-                  }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
+                  style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
-                  {firstWord}
+                  {renderColoredText(firstWord)}
                 </motion.h2>
                 <motion.h2
-                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-center text-transparent bg-clip-text bg-cover bg-center [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
-                  style={{
-                    transform: `translateX(${textTranslateX}vw)`,
-                    backgroundImage: "url('/logo_transparent.png')",
-                  }}
+                  className="text-4xl md:text-5xl lg:text-6xl font-bold text-center [-webkit-text-stroke:3px_black] [paint-order:stroke_fill] [text-shadow:_0_3px_24px_rgba(0,0,0,0.75)] transition-none"
+                  style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
-                  {restOfTitle}
+                  {renderColoredText(restOfTitle)}
                 </motion.h2>
               </div>
             </div>
