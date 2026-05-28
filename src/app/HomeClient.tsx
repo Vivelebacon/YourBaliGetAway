@@ -19,7 +19,7 @@ export default function HomeClient() {
         mediaType="video"
         mediaSrc="/hero.mp4"
         bgImageSrc="/hero1.jpg"
-        title="Your Private Bali Escape"
+        title="Your Bali Getaway"
         date="Bali, Indonesia"
         scrollToExpand="Scroll to explore"
       />

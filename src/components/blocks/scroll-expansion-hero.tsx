@@ -312,13 +312,13 @@ const ScrollExpandMedia = ({
                 }`}
               >
                 <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-white [text-shadow:_0_2px_18px_rgba(0,0,0,0.55)] transition-none'
+                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-white [-webkit-text-stroke:2px_black] [paint-order:stroke_fill] [text-shadow:_0_2px_18px_rgba(0,0,0,0.55)] transition-none'
                   style={{ transform: `translateX(-${textTranslateX}vw)` }}
                 >
                   {firstWord}
                 </motion.h2>
                 <motion.h2
-                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white [text-shadow:_0_2px_18px_rgba(0,0,0,0.55)] transition-none'
+                  className='text-4xl md:text-5xl lg:text-6xl font-bold text-center text-white [-webkit-text-stroke:2px_black] [paint-order:stroke_fill] [text-shadow:_0_2px_18px_rgba(0,0,0,0.55)] transition-none'
                   style={{ transform: `translateX(${textTranslateX}vw)` }}
                 >
                   {restOfTitle}
