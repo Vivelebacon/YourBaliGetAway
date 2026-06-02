@@ -27,6 +27,13 @@ h1, h2, h3, h4 {
 #hostaway-booking-widget,
 #hostaway-calendar-widget {
   width: 100%;
+  overflow: visible;
+}
+
+/* Let the date-picker popover escape any internal wrappers */
+#hostaway-booking-widget *,
+#hostaway-calendar-widget * {
+  overflow: visible;
 }
 
 #hostaway-booking-widget iframe,

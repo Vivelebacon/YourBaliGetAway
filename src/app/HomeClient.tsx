@@ -105,7 +105,7 @@ export default function HomeClient() {
               Select your dates and villa below. Real-time calendar — no double bookings, ever.
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-6">
+          <div className="relative bg-white rounded-2xl shadow-sm p-6">
             <HostawaySearchBar />
           </div>
         </div>
