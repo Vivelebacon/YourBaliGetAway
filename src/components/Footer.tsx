@@ -62,7 +62,7 @@ export default function Footer() {
 
       <div className="max-w-6xl mx-auto px-6 mt-12 pt-6 border-t border-stone-700 text-xs text-stone-500 flex flex-col md:flex-row justify-between gap-2">
         <p>© {new Date().getFullYear()} YBG Villas. All rights reserved.</p>
-        <p>Powered by Smoobu — Real-time availability, zero double bookings.</p>
+        <p>Powered by Hostaway. Real-time availability, zero double bookings.</p>
       </div>
     </footer>
   )

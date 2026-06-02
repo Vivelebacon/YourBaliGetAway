@@ -4,9 +4,9 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import BookingWidget from '@/components/BookingWidget'
+import HostawayCalendar from '@/components/HostawayCalendar'
 import Gallery from '@/components/Gallery'
-import { villas, getVilla, getSmoobuId } from '@/lib/villas'
+import { villas, getVilla, getHostawayListingId } from '@/lib/villas'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -31,7 +31,7 @@ export default async function VillaPage({ params }: Props) {
   const villa = getVilla(slug)
   if (!villa) notFound()
 
-  const widgetId = getSmoobuId(slug)
+  const listingId = getHostawayListingId(slug)
   const base = `/images/${slug}`
   const hero = { path: villa.coverImage, category: 'Pool', label: 'Pool' }
   const others = villas.filter((v) => v.slug !== slug).slice(0, 3)
@@ -140,9 +140,9 @@ export default async function VillaPage({ params }: Props) {
           <div className="text-center mb-10">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
             <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
-            <p className="text-stone-500 text-sm">Real-time availability. No double bookings. Best rate guaranteed.</p>
+            <p className="text-stone-500 text-sm">Real-time availability. Send a request and your host confirms. Best rate guaranteed.</p>
           </div>
-          <BookingWidget widgetId={widgetId} />
+          {listingId && <HostawayCalendar listingId={listingId} />}
         </div>
       </section>
 

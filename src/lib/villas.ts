@@ -1,19 +1,19 @@
 // ─────────────────────────────────────────────
-// Smoobu config
+// Hostaway config
 // ─────────────────────────────────────────────
-export const SMOOBU_GROUP_ID = '1690897'
-
-const SMOOBU_IDS: Record<string, string> = {
-  'bali-bliss': '3241317',
-  'bali-blue-1': '3241322',
-  'bali-blue-2': '3241327',
-  'bali-green': '3241332',
-  'bali-sol': '3241337',
+// Per-villa Hostaway listing IDs (from the Hostaway dashboard listing list).
+// Used by the Hostaway calendar widget on each villa page.
+const HOSTAWAY_LISTING_IDS: Record<string, number> = {
+  'bali-green': 550011,
+  'bali-bliss': 550012,
+  'bali-blue-1': 550013,
+  'bali-blue-2': 550014,
+  'bali-sol': 550015,
 }
 
-// Returns the per-villa apartment ID (used to build the widget URL)
-export function getSmoobuId(slug: string): string {
-  return SMOOBU_IDS[slug] ?? ''
+// Returns the per-villa Hostaway listing ID.
+export function getHostawayListingId(slug: string): number | undefined {
+  return HOSTAWAY_LISTING_IDS[slug]
 }
 
 // ─────────────────────────────────────────────

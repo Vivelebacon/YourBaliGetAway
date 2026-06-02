@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import BookingWidget from '@/components/BookingWidget'
+import HostawaySearchBar from '@/components/HostawaySearchBar'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
 import { villas } from '@/lib/villas'
@@ -83,7 +83,7 @@ export default function HomeClient() {
         <div className="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-10 text-center">
           {[
             { icon: '✦', title: 'Best Rate Guarantee', body: 'Book direct and pay no platform fees. Always cheaper than Airbnb.' },
-            { icon: '◈', title: 'Instant Confirmation', body: 'Real-time availability powered by Smoobu. No waiting, no double bookings.' },
+            { icon: '◈', title: 'Quick Confirmation', body: 'Send your dates and your host confirms personally. No double bookings, ever.' },
             { icon: '❋', title: 'Personal Service', body: 'Direct contact with your host via WhatsApp for a tailored Bali experience.' },
           ].map((item) => (
             <div key={item.title} className="text-white">
@@ -105,8 +105,8 @@ export default function HomeClient() {
               Select your dates and villa below. Real-time calendar — no double bookings, ever.
             </p>
           </div>
-          <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-            <BookingWidget />
+          <div className="bg-white rounded-2xl shadow-sm overflow-hidden p-6">
+            <HostawaySearchBar />
           </div>
         </div>
       </section>

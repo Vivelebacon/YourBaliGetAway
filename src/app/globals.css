@@ -23,8 +23,14 @@ h1, h2, h3, h4 {
   font-family: var(--font-cormorant);
 }
 
-/* Smoobu widget container */
-.smoobu-widget-wrapper iframe {
+/* Hostaway widget containers */
+#hostaway-booking-widget,
+#hostaway-calendar-widget {
+  width: 100%;
+}
+
+#hostaway-booking-widget iframe,
+#hostaway-calendar-widget iframe {
   width: 100% !important;
   border: none;
 }
