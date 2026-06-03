@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 
 // ── Date helpers (local, no timezone surprises) ──
 function ymd(d: Date) {
@@ -93,6 +93,30 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
       cancelled = true
     }
   }, [listingId, today])
+
+  // ── Prefill dates from ?checkIn=&checkOut= (e.g. coming from homepage search) ──
+  const prefilled = useRef(false)
+  useEffect(() => {
+    if (loading || prefilled.current || days.size === 0) return
+    prefilled.current = true
+    const params = new URLSearchParams(window.location.search)
+    const ci = params.get('checkIn')
+    const co = params.get('checkOut')
+    const re = /^\d{4}-\d{2}-\d{2}$/
+    if (!ci || !co || !re.test(ci) || !re.test(co)) return
+    const inDate = fromYmd(ci)
+    const outDate = fromYmd(co)
+    if (outDate <= inDate) return
+    // Validate availability + min stay before applying.
+    for (let i = 0; i < nights(inDate, outDate); i++) {
+      const info = days.get(ymd(addDays(inDate, i)))
+      if (!info || !info.available) return
+    }
+    if (nights(inDate, outDate) < (days.get(ci)?.minStay ?? 1)) return
+    setCheckIn(inDate)
+    setCheckOut(outDate)
+    setViewMonth(startOfMonth(inDate))
+  }, [loading, days])
 
   // ── Range math ──
   const nightsCount = checkIn && checkOut ? nights(checkIn, checkOut) : 0

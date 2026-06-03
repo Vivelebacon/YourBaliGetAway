@@ -4,7 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import HostawaySearchBar from '@/components/HostawaySearchBar'
+import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
 import { villas } from '@/lib/villas'
@@ -105,8 +105,8 @@ export default function HomeClient() {
               Select your dates and villa below. Real-time calendar — no double bookings, ever.
             </p>
           </div>
-          <div className="relative bg-white rounded-2xl shadow-sm p-6">
-            <HostawaySearchBar />
+          <div className="relative bg-white rounded-2xl shadow-sm p-6 md:p-8">
+            <VillaSearch />
           </div>
         </div>
       </section>

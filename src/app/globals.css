@@ -38,22 +38,3 @@ h1, h2, h3, h4 {
 .input:focus {
   border-color: #3d5a3e;
 }
-
-/* Hostaway widget containers */
-#hostaway-booking-widget,
-#hostaway-calendar-widget {
-  width: 100%;
-  overflow: visible;
-}
-
-/* Let the date-picker popover escape any internal wrappers */
-#hostaway-booking-widget *,
-#hostaway-calendar-widget * {
-  overflow: visible;
-}
-
-#hostaway-booking-widget iframe,
-#hostaway-calendar-widget iframe {
-  width: 100% !important;
-  border: none;
-}
