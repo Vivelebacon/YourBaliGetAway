@@ -2,12 +2,44 @@
 // Hostaway Public API client — SERVER ONLY.
 // Never import this from a client component. It reads the secret
 // API key from env and talks to Hostaway directly.
+//
+// ⚠️ SAFETY CONTRACT (do not weaken):
+// This client is intentionally restricted to THREE operations:
+//   1. authenticate                 → POST /accessTokens
+//   2. read availability/listings   → GET  (any path)
+//   3. create a request-to-book     → POST /reservations  (status 'inquiry' only)
+// It must NEVER cancel, modify, or delete a reservation, nor block/unblock a
+// calendar. Hostaway's API key cannot be scoped read-only, so we enforce this
+// in code: guardedFetch() throws on any PUT/PATCH/DELETE and on any POST to a
+// path other than the two allowed. A leaked-key scenario is out of scope here;
+// this guard protects against our own code (or a future edit) ever issuing a
+// destructive call to real bookings or the Airbnb-synced calendar.
 // ──────────────────────────────────────────────────────────────
 
 const API_BASE = 'https://api.hostaway.com/v1'
 
 // Channel id for direct/website bookings in Hostaway.
 const DIRECT_CHANNEL_ID = 2000
+
+// The ONLY non-GET endpoints this client is permitted to call.
+const ALLOWED_POST_PATHS = ['/accessTokens', '/reservations']
+
+function assertAllowed(method: string, path: string) {
+  const m = (method || 'GET').toUpperCase()
+  if (m === 'GET') return // reads are always safe
+  const basePath = path.split('?')[0]
+  if (m === 'POST' && ALLOWED_POST_PATHS.includes(basePath)) return
+  throw new Error(
+    `Hostaway client BLOCKED a ${m} ${basePath}. This integration is read + create-inquiry only; ` +
+      `cancelling, modifying, deleting reservations or blocking calendars is forbidden.`,
+  )
+}
+
+// Every call to Hostaway goes through here.
+async function guardedFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  assertAllowed(init.method ?? 'GET', path)
+  return fetch(`${API_BASE}${path}`, init)
+}
 
 // ── Access token (cached in module memory across warm invocations) ──
 let cachedToken: { token: string; expiresAt: number } | null = null
@@ -23,7 +55,7 @@ export async function getAccessToken(): Promise<string> {
     throw new Error('Missing HOSTAWAY_ACCOUNT_ID or HOSTAWAY_API_KEY env var')
   }
 
-  const res = await fetch(`${API_BASE}/accessTokens`, {
+  const res = await guardedFetch('/accessTokens', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
@@ -53,7 +85,8 @@ export async function getAccessToken(): Promise<string> {
 
 async function hostawayGet<T>(path: string): Promise<T> {
   const token = await getAccessToken()
-  const res = await fetch(`${API_BASE}${path}`, {
+  const res = await guardedFetch(path, {
+    method: 'GET',
     headers: { Authorization: `Bearer ${token}`, 'Cache-Control': 'no-cache' },
   })
   if (!res.ok) {
@@ -114,7 +147,8 @@ export async function createBookingRequest(
   input: BookingRequestInput,
 ): Promise<{ id: number; status: string }> {
   const token = await getAccessToken()
-  const res = await fetch(`${API_BASE}/reservations?forceOverbooking=0`, {
+  // forceOverbooking=0 ensures we never overwrite an existing reservation.
+  const res = await guardedFetch('/reservations?forceOverbooking=0', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${token}`,
@@ -131,6 +165,7 @@ export async function createBookingRequest(
       numberOfGuests: input.numberOfGuests,
       phone: input.phone,
       comment: input.comment,
+      // Hardcoded: a website request is ALWAYS an inquiry. Never a confirmed booking.
       status: 'inquiry',
     }),
   })
