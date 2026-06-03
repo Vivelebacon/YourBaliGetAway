@@ -10,7 +10,7 @@ const WIDGET_SRC = 'https://d2q3n06xhbi0am.cloudfront.net/widget.js?1640277196'
 // baseUrl = the Hostaway booking website the widget redirects to.
 // Set NEXT_PUBLIC_HOSTAWAY_BASE_URL to Joel's Hostaway booking site URL.
 const BASE_URL =
-  process.env.NEXT_PUBLIC_HOSTAWAY_BASE_URL || 'https://www.yourbaligetaway.com/'
+  process.env.NEXT_PUBLIC_HOSTAWAY_BASE_URL || 'https://197676_1.holidayfuture.com/'
 
 declare global {
   interface Window {
