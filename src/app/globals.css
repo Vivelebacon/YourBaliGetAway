@@ -23,6 +23,22 @@ h1, h2, h3, h4 {
   font-family: var(--font-cormorant);
 }
 
+/* Booking form inputs */
+.input {
+  width: 100%;
+  border: 1px solid #e7e5e4;
+  border-radius: 0.75rem;
+  padding: 0.625rem 0.875rem;
+  font-size: 0.95rem;
+  color: #1a1a1a;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.input:focus {
+  border-color: #3d5a3e;
+}
+
 /* Hostaway widget containers */
 #hostaway-booking-widget,
 #hostaway-calendar-widget {

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import type { Metadata } from 'next'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
-import HostawayCalendar from '@/components/HostawayCalendar'
+import BookingCalendar from '@/components/BookingCalendar'
 import Gallery from '@/components/Gallery'
 import { villas, getVilla, getHostawayListingId } from '@/lib/villas'
 
@@ -142,7 +142,9 @@ export default async function VillaPage({ params }: Props) {
             <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
             <p className="text-stone-500 text-sm">Real-time availability. Send a request and your host confirms. Best rate guaranteed.</p>
           </div>
-          {listingId && <HostawayCalendar listingId={listingId} />}
+          {listingId && (
+            <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
+          )}
         </div>
       </section>
 
