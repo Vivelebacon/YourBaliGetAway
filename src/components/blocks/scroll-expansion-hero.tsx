@@ -149,6 +149,17 @@ const ScrollExpandMedia = ({
     };
   }, [scrollProgress, mediaFullyExpanded, touchStartY]);
 
+  // Allow the navbar (or anything) to skip the hero animation and release scroll.
+  useEffect(() => {
+    const onExpand = (): void => {
+      setScrollProgress(1);
+      setMediaFullyExpanded(true);
+      setShowContent(true);
+    };
+    window.addEventListener('hero:expand', onExpand as EventListener);
+    return () => window.removeEventListener('hero:expand', onExpand as EventListener);
+  }, []);
+
   useEffect(() => {
     const checkIfMobile = (): void => {
       setIsMobileState(window.innerWidth < 768);

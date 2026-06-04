@@ -97,6 +97,20 @@ export default async function VillaPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ── Booking Widget ── */}
+      <section id="book" className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
+            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
+            <p className="text-stone-500 text-sm">Real-time availability. Send a request and your host confirms. Best rate guaranteed.</p>
+          </div>
+          {listingId && (
+            <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
+          )}
+        </div>
+      </section>
+
       {/* ── Gallery ── */}
       <section className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
@@ -131,20 +145,6 @@ export default async function VillaPage({ params }: Props) {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ── Booking Widget ── */}
-      <section id="book" className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
-            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
-            <p className="text-stone-500 text-sm">Real-time availability. Send a request and your host confirms. Best rate guaranteed.</p>
-          </div>
-          {listingId && (
-            <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
-          )}
         </div>
       </section>
 
