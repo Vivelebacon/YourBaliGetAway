@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
-import type { VillaImage } from '@/lib/villas'
+import type { GalleryImage } from '@/lib/content'
 
 interface GalleryProps {
-  slug: string
-  images: VillaImage[]
+  images: GalleryImage[]
 }
 
-export default function Gallery({ slug, images }: GalleryProps) {
+export default function Gallery({ images }: GalleryProps) {
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const open = (i: number) => setLightboxIndex(i)
@@ -41,7 +40,6 @@ export default function Gallery({ slug, images }: GalleryProps) {
     return () => { document.body.style.overflow = '' }
   }, [lightboxIndex])
 
-  const base = `/images/${slug}`
   const current = lightboxIndex !== null ? images[lightboxIndex] : null
 
   return (
@@ -55,8 +53,8 @@ export default function Gallery({ slug, images }: GalleryProps) {
             onClick={() => open(i)}
           >
             <Image
-              src={`${base}/${img.path}`}
-              alt={`${img.label}`}
+              src={img.url}
+              alt={img.category}
               width={600}
               height={400}
               className="w-full object-cover transition-transform duration-500 group-hover/img:scale-105"
@@ -113,8 +111,8 @@ export default function Gallery({ slug, images }: GalleryProps) {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={`${base}/${current.path}`}
-              alt={current.label}
+              src={current.url}
+              alt={current.category}
               width={1400}
               height={900}
               className="w-full object-contain max-h-[72vh]"

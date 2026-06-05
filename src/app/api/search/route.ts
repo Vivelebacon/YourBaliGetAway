@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCalendar, getListingCurrency } from '@/lib/hostaway'
-import { villas, getHostawayListingId } from '@/lib/villas'
+import { getHostawayListingId } from '@/lib/villas'
+import { getVillasList } from '@/lib/content'
 
 const DATE_RE = /^\d{4}-\d{2}-\d{2}$/
 
@@ -26,6 +27,8 @@ export async function GET(req: NextRequest) {
   const totalNights = nightsBetween(start, end)
   let currency = 'USD'
 
+  const villas = await getVillasList()
+
   const results = await Promise.all(
     villas.map(async (v) => {
       const listingId = getHostawayListingId(v.slug)
@@ -33,7 +36,7 @@ export async function GET(req: NextRequest) {
         slug: v.slug,
         name: v.name,
         subtitle: v.subtitle,
-        coverImage: v.coverImage,
+        coverUrl: v.coverUrl,
         guests: v.guests,
         bedrooms: v.bedrooms,
       }
@@ -70,7 +73,7 @@ export async function GET(req: NextRequest) {
   )
 
   try {
-    const firstId = getHostawayListingId(villas[0].slug)
+    const firstId = villas[0] ? getHostawayListingId(villas[0].slug) : undefined
     if (firstId) currency = await getListingCurrency(firstId)
   } catch {
     /* keep default */

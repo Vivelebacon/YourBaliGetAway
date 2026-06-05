@@ -7,9 +7,9 @@ import Footer from '@/components/Footer'
 import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
-import { villas } from '@/lib/villas'
+import type { VillaListItem } from '@/lib/content'
 
-export default function HomeClient() {
+export default function HomeClient({ villas }: { villas: VillaListItem[] }) {
   return (
     <div className="min-h-screen bg-villa-cream">
       <Navbar />
@@ -43,7 +43,7 @@ export default function HomeClient() {
               >
                 <div className="relative h-64 overflow-hidden">
                   <Image
-                    src={`/images/${villa.slug}/${villa.coverImage}`}
+                    src={villa.coverUrl}
                     alt={villa.name}
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"

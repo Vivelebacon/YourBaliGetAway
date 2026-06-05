@@ -6,19 +6,25 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import BookingCalendar from '@/components/BookingCalendar'
 import Gallery from '@/components/Gallery'
-import { villas, getVilla, getHostawayListingId } from '@/lib/villas'
+import { getHostawayListingId } from '@/lib/villas'
+import { getVillaBySlug, getVillaSlugs, getVillasList } from '@/lib/content'
+
+// Revalidate from Supabase periodically; admin edits also trigger on-demand
+// revalidation, so changes appear within seconds.
+export const revalidate = 60
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
 export async function generateStaticParams() {
-  return villas.map((v) => ({ slug: v.slug }))
+  const slugs = await getVillaSlugs()
+  return slugs.map((slug) => ({ slug }))
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const villa = getVilla(slug)
+  const villa = await getVillaBySlug(slug)
   if (!villa) return {}
   return {
     title: `${villa.name} — ${villa.subtitle} | YBG Villas`,
@@ -28,15 +34,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VillaPage({ params }: Props) {
   const { slug } = await params
-  const villa = getVilla(slug)
+  const villa = await getVillaBySlug(slug)
   if (!villa) notFound()
 
   const listingId = getHostawayListingId(slug)
-  const base = `/images/${slug}`
-  const hero = { path: villa.coverImage, category: 'Pool', label: 'Pool' }
-  const others = villas.filter((v) => v.slug !== slug).slice(0, 3)
+  const others = (await getVillasList()).filter((v) => v.slug !== slug).slice(0, 3)
 
-  // Render description paragraphs
   const descParagraphs = villa.description.split('\n\n').filter(Boolean)
 
   return (
@@ -45,7 +48,7 @@ export default async function VillaPage({ params }: Props) {
 
       {/* ── Hero ── */}
       <section className="relative h-[80vh]">
-        <Image src={`${base}/${hero.path}`} alt={`${villa.name}`} fill className="object-cover" priority />
+        <Image src={villa.coverUrl} alt={villa.name} fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pt-16">
           <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">YBG Villas</p>
@@ -115,7 +118,7 @@ export default async function VillaPage({ params }: Props) {
       <section className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-3xl text-villa-dark mb-8">Gallery</h2>
-          <Gallery slug={slug} images={villa.images} />
+          <Gallery images={villa.images} />
         </div>
       </section>
 
@@ -156,7 +159,7 @@ export default async function VillaPage({ params }: Props) {
             {others.map((v) => (
               <Link key={v.slug} href={`/villas/${v.slug}`} className="group bg-villa-cream rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
                 <div className="relative h-48 overflow-hidden">
-                  <Image src={`/images/${v.slug}/${v.coverImage}`} alt={v.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={v.coverUrl} alt={v.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-5">
                   <div className="flex items-center justify-between mb-1">

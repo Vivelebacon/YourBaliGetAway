@@ -8,7 +8,7 @@ interface VillaResult {
   slug: string
   name: string
   subtitle: string
-  coverImage: string
+  coverUrl: string
   guests: number
   bedrooms: number
   available: boolean
@@ -129,7 +129,7 @@ export default function VillaSearch() {
                   >
                     <div className="relative h-44 overflow-hidden">
                       <Image
-                        src={`/images/${v.slug}/${v.coverImage}`}
+                        src={v.coverUrl}
                         alt={v.name}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
