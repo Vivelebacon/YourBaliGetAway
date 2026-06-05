@@ -15,11 +15,12 @@ Follow these once to stand up the CMS backend. ~10 minutes.
 
 ## 3. Get the keys
 **Project Settings → API**, copy:
-- **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+- **Project URL** → `NEXT_PUBLIC_SUPABASE_URL` (e.g. `https://xxxx.supabase.co`)
 - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 - **service_role** key → `SUPABASE_SERVICE_ROLE_KEY` (server-side only, never in the browser)
 
-Send these to Hugo / paste into Vercel env. They also go in `.env.local` for local dev.
+These go in `.env.local` (gitignored) and in Vercel env. Do NOT paste real keys
+into this file: it is committed to git.
 
 ## 4. Create the admin login(s)
 **Authentication → Users → Add user** (email + password). Create one for you and
