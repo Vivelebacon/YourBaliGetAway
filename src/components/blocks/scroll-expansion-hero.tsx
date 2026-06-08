@@ -182,8 +182,14 @@ const ScrollExpandMedia = ({
     return () => window.removeEventListener('resize', checkIfMobile);
   }, []);
 
-  const mediaWidth = 300 + scrollProgress * (isMobileState ? 650 : 1250);
-  const mediaHeight = 400 + scrollProgress * (isMobileState ? 200 : 400);
+  // On mobile the framed media starts smaller so the background image is
+  // clearly visible before the zoom animation (then grows to the same end size).
+  const mediaWidth = isMobileState
+    ? 200 + scrollProgress * 750
+    : 300 + scrollProgress * 1250;
+  const mediaHeight = isMobileState
+    ? 260 + scrollProgress * 340
+    : 400 + scrollProgress * 400;
   const textTranslateX = scrollProgress * (isMobileState ? 180 : 150);
 
   const firstWord = title ? title.split(' ')[0] : '';
