@@ -28,18 +28,17 @@ export default function Navbar() {
     }, 80)
   }
 
-  // Home: on the homepage, release the hero lock and scroll to top.
-  // On other pages, let the Link navigate to "/".
+  // Home: on the homepage, reset the hero to its initial state at the very top
+  // (before the animation). On other pages, let the Link navigate to "/".
   function goHome(e: React.MouseEvent) {
     setOpen(false)
     if (pathname !== '/') return
     e.preventDefault()
-    window.dispatchEvent(new CustomEvent('hero:expand'))
-    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 80)
+    window.dispatchEvent(new CustomEvent('hero:reset'))
   }
 
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-sm border-b border-stone-200' : 'bg-transparent border-b border-white/10'}`}>
+    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-sm border-b border-stone-200' : 'bg-gradient-to-b from-black/55 via-black/25 to-transparent border-b border-white/10'}`}>
       <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
         <Link href="/">
           <Image
@@ -53,16 +52,16 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" onClick={goHome} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
+          <Link href="/" onClick={goHome} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
             Home
           </Link>
-          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
+          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
             Our Villas
           </Link>
-          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
+          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
             Book
           </Link>
-          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
+          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
             Contact
           </Link>
           <a

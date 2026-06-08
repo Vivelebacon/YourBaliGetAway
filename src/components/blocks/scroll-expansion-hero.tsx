@@ -156,8 +156,19 @@ const ScrollExpandMedia = ({
       setMediaFullyExpanded(true);
       setShowContent(true);
     };
+    // Reset the hero to its initial, un-animated state (very top of the page).
+    const onReset = (): void => {
+      setMediaFullyExpanded(false);
+      setShowContent(false);
+      setScrollProgress(0);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
     window.addEventListener('hero:expand', onExpand as EventListener);
-    return () => window.removeEventListener('hero:expand', onExpand as EventListener);
+    window.addEventListener('hero:reset', onReset as EventListener);
+    return () => {
+      window.removeEventListener('hero:expand', onExpand as EventListener);
+      window.removeEventListener('hero:reset', onReset as EventListener);
+    };
   }, []);
 
   useEffect(() => {
