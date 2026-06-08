@@ -46,7 +46,7 @@ export default function Navbar() {
             alt="YBG Villas"
             width={140}
             height={70}
-            className="object-contain w-auto h-9 md:h-[70px]"
+            className="object-contain w-auto h-[55px] md:h-[70px]"
           />
         </Link>
 
