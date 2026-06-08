@@ -28,6 +28,16 @@ export default function Navbar() {
     }, 80)
   }
 
+  // Home: on the homepage, release the hero lock and scroll to top.
+  // On other pages, let the Link navigate to "/".
+  function goHome(e: React.MouseEvent) {
+    setOpen(false)
+    if (pathname !== '/') return
+    e.preventDefault()
+    window.dispatchEvent(new CustomEvent('hero:expand'))
+    setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 80)
+  }
+
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white shadow-sm border-b border-stone-200' : 'bg-transparent border-b border-white/10'}`}>
       <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
@@ -43,6 +53,9 @@ export default function Navbar() {
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
+          <Link href="/" onClick={goHome} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
+            Home
+          </Link>
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white/90 hover:text-white'}`}>
             Our Villas
           </Link>
@@ -75,6 +88,7 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white/95 backdrop-blur-sm border-t border-stone-200 px-6 py-4 flex flex-col gap-4">
+          <Link href="/" onClick={goHome} className="text-villa-dark hover:text-villa-green">Home</Link>
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className="text-villa-dark hover:text-villa-green">Our Villas</Link>
           <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className="text-villa-dark hover:text-villa-green">Book</Link>
           <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className="text-villa-dark hover:text-villa-green">Contact</Link>
