@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCalendar, getListingCurrency } from '@/lib/hostaway'
+import { getCalendar, getListingPricing, losDiscountMultiplier } from '@/lib/hostaway'
 import { getHostawayListingId } from '@/lib/villas'
 import { getVillasList } from '@/lib/content'
 
@@ -44,7 +44,10 @@ export async function GET(req: NextRequest) {
       if (v.guests < guests) return { ...base, available: false, total: 0 }
 
       try {
-        const days = await getCalendar(listingId, start, end)
+        const [days, pricing] = await Promise.all([
+          getCalendar(listingId, start, end),
+          getListingPricing(listingId),
+        ])
         const byDate = new Map(days.map((d) => [d.date, d]))
         // Check each night from start (inclusive) to end (exclusive).
         let total = 0
@@ -65,19 +68,21 @@ export async function GET(req: NextRequest) {
         if (available && arrivalInfo && totalNights < arrivalInfo.minimumStay) {
           available = false
         }
-        return { ...base, available, total: available ? total : 0 }
+        // Apply length-of-stay discount to the displayed total.
+        const mult = losDiscountMultiplier(totalNights, pricing)
+        const discountedTotal = Math.round(total * mult)
+        currency = pricing.currency
+        return {
+          ...base,
+          available,
+          total: available ? discountedTotal : 0,
+          discountPct: available ? Math.round((1 - mult) * 100) : 0,
+        }
       } catch {
-        return { ...base, available: false, total: 0 }
+        return { ...base, available: false, total: 0, discountPct: 0 }
       }
     }),
   )
-
-  try {
-    const firstId = villas[0] ? getHostawayListingId(villas[0].slug) : undefined
-    if (firstId) currency = await getListingCurrency(firstId)
-  } catch {
-    /* keep default */
-  }
 
   return NextResponse.json(
     { nights: totalNights, currency, villas: results },

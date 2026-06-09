@@ -51,6 +51,8 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
 
   const [days, setDays] = useState<Map<string, DayInfo>>(new Map())
   const [currency, setCurrency] = useState('USD')
+  // Length-of-stay discount multipliers from Hostaway (1 = no discount).
+  const [discount, setDiscount] = useState({ weekly: 1, monthly: 1 })
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
 
@@ -82,6 +84,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
         for (const d of data.days as DayInfo[]) map.set(d.date, d)
         setDays(map)
         setCurrency(data.currency || 'USD')
+        setDiscount({ weekly: data.weeklyDiscount ?? 1, monthly: data.monthlyDiscount ?? 1 })
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message)
       } finally {
@@ -132,6 +135,11 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
 
   const money = (n: number) =>
     new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(n)
+
+  // Length-of-stay discount applied to the displayed total.
+  const discountMult = nightsCount >= 28 ? discount.monthly : nightsCount >= 7 ? discount.weekly : 1
+  const discountedTotal = Math.round(totalPrice * discountMult)
+  const discountPct = Math.round((1 - discountMult) * 100)
 
   // All nights in [a, b) are available?
   function rangeAvailable(a: Date, b: Date) {
@@ -337,8 +345,21 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
                 {ymd(checkIn!)} → {ymd(checkOut!)}
               </p>
               <p className="text-villa-muted text-sm">
-                {nightsCount} {nightsCount === 1 ? 'night' : 'nights'} · {money(totalPrice)} total
+                {nightsCount} {nightsCount === 1 ? 'night' : 'nights'} ·{' '}
+                {discountPct > 0 ? (
+                  <>
+                    <span className="line-through opacity-60">{money(totalPrice)}</span>{' '}
+                    <span className="text-villa-dark font-medium">{money(discountedTotal)}</span> total
+                  </>
+                ) : (
+                  <>{money(totalPrice)} total</>
+                )}
               </p>
+              {discountPct > 0 && (
+                <p className="text-villa-green text-xs mt-1">
+                  {discountPct}% {nightsCount >= 28 ? 'monthly' : 'weekly'} discount applied
+                </p>
+              )}
             </div>
             <button
               type="button"

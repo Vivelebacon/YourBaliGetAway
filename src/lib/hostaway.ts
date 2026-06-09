@@ -118,15 +118,44 @@ export async function getCalendar(
   )
 }
 
-// Listing currency, cached per listing in module memory.
-const currencyCache = new Map<number, string>()
-export async function getListingCurrency(listingId: number): Promise<string> {
-  const cached = currencyCache.get(listingId)
+// Listing pricing info (currency + length-of-stay discount multipliers),
+// cached per listing in module memory.
+// weeklyDiscount/monthlyDiscount are Hostaway multipliers (e.g. 0.9 = 10% off).
+export interface ListingPricing {
+  currency: string
+  weeklyDiscount: number // applied for stays >= 7 nights
+  monthlyDiscount: number // applied for stays >= 28 nights
+}
+
+const pricingCache = new Map<number, ListingPricing>()
+
+export async function getListingPricing(listingId: number): Promise<ListingPricing> {
+  const cached = pricingCache.get(listingId)
   if (cached) return cached
-  const listing = await hostawayGet<{ currencyCode?: string }>(`/listings/${listingId}`)
-  const currency = listing.currencyCode || 'USD'
-  currencyCache.set(listingId, currency)
-  return currency
+  const l = await hostawayGet<{
+    currencyCode?: string
+    weeklyDiscount?: number
+    monthlyDiscount?: number
+  }>(`/listings/${listingId}`)
+  // Only treat a value as a real discount if it's a fraction in (0, 1).
+  const norm = (v?: number) => (typeof v === 'number' && v > 0 && v < 1 ? v : 1)
+  const pricing: ListingPricing = {
+    currency: l.currencyCode || 'USD',
+    weeklyDiscount: norm(l.weeklyDiscount),
+    monthlyDiscount: norm(l.monthlyDiscount),
+  }
+  pricingCache.set(listingId, pricing)
+  return pricing
+}
+
+// Length-of-stay discount multiplier for a given number of nights.
+export function losDiscountMultiplier(
+  nights: number,
+  p: { weeklyDiscount: number; monthlyDiscount: number },
+): number {
+  if (nights >= 28) return p.monthlyDiscount
+  if (nights >= 7) return p.weeklyDiscount
+  return 1
 }
 
 // ── Create a request-to-book (inquiry) reservation ──

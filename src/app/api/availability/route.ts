@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getCalendar, getListingCurrency } from '@/lib/hostaway'
+import { getCalendar, getListingPricing } from '@/lib/hostaway'
 
 // Cache availability briefly at the edge; it doesn't change second-to-second.
 export const revalidate = 0
@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [days, currency] = await Promise.all([
+    const [days, pricing] = await Promise.all([
       getCalendar(listingId, start, end),
-      getListingCurrency(listingId),
+      getListingPricing(listingId),
     ])
 
     const slim = days.map((d) => ({
@@ -30,7 +30,12 @@ export async function GET(req: NextRequest) {
     }))
 
     return NextResponse.json(
-      { days: slim, currency },
+      {
+        days: slim,
+        currency: pricing.currency,
+        weeklyDiscount: pricing.weeklyDiscount,
+        monthlyDiscount: pricing.monthlyDiscount,
+      },
       { headers: { 'Cache-Control': 's-maxage=300, stale-while-revalidate=600' } },
     )
   } catch (e) {

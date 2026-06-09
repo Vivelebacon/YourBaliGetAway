@@ -13,6 +13,7 @@ interface VillaResult {
   bedrooms: number
   available: boolean
   total: number
+  discountPct: number
 }
 
 function todayISO(offsetDays = 0) {
@@ -139,7 +140,14 @@ export default function VillaSearch() {
                       <h3 className="font-serif text-xl text-villa-dark">{v.name}</h3>
                       <p className="text-villa-muted text-sm mb-3">{v.subtitle}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-villa-dark font-medium">{money(v.total)}</span>
+                        <span className="text-villa-dark font-medium">
+                          {money(v.total)}
+                          {v.discountPct > 0 && (
+                            <span className="ml-2 text-xs font-medium text-villa-green">
+                              {v.discountPct}% off
+                            </span>
+                          )}
+                        </span>
                         <span className="text-villa-green text-sm group-hover:underline">View &amp; book →</span>
                       </div>
                     </div>
