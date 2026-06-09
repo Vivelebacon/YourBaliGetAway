@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { useCurrency } from './CurrencyProvider'
 
 interface VillaResult {
   slug: string
@@ -29,11 +30,10 @@ export default function VillaSearch() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [results, setResults] = useState<VillaResult[] | null>(null)
-  const [currency, setCurrency] = useState('USD')
   const [searched, setSearched] = useState(false)
+  const { format } = useCurrency()
 
-  const money = (n: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(n)
+  const money = (n: number) => format(n)
 
   async function search(e: React.FormEvent) {
     e.preventDefault()
@@ -53,7 +53,6 @@ export default function VillaSearch() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Search failed')
       setResults(data.villas)
-      setCurrency(data.currency || 'USD')
     } catch (err) {
       setError((err as Error).message)
       setResults(null)

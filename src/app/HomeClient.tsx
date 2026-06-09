@@ -7,9 +7,11 @@ import Footer from '@/components/Footer'
 import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
-import type { VillaListItem } from '@/lib/content'
+import { useCurrency } from '@/components/CurrencyProvider'
+import type { VillaCard } from './HomeWrapper'
 
-export default function HomeClient({ villas }: { villas: VillaListItem[] }) {
+export default function HomeClient({ villas }: { villas: VillaCard[] }) {
+  const { format } = useCurrency()
   return (
     <div className="min-h-screen bg-villa-cream">
       <Navbar />
@@ -65,11 +67,18 @@ export default function HomeClient({ villas }: { villas: VillaListItem[] }) {
                     <span className="text-villa-gold text-sm flex items-center gap-1">★ {villa.rating}</span>
                   </div>
                   <p className="text-villa-muted text-sm mb-4">{villa.subtitle}</p>
-                  <div className="flex items-center gap-4 text-sm text-villa-muted mb-5">
+                  <div className="flex items-center gap-4 text-sm text-villa-muted mb-4">
                     <span className="flex items-center gap-1"><BedIcon /> {villa.bedrooms} BR</span>
                     <span className="flex items-center gap-1"><BathIcon /> {villa.bathrooms} BA</span>
                     <span className="flex items-center gap-1"><GuestIcon /> {villa.guests} guests</span>
                   </div>
+                  {villa.fromPrice != null && (
+                    <p className="text-villa-dark mb-4">
+                      <span className="text-xs text-villa-muted">From </span>
+                      <span className="font-medium">{format(villa.fromPrice)}</span>
+                      <span className="text-xs text-villa-muted"> / night</span>
+                    </p>
+                  )}
                   <span className="text-villa-green text-sm font-medium group-hover:underline">View Villa →</span>
                 </div>
               </Link>

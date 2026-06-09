@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
+import CurrencySwitcher from './CurrencySwitcher'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
@@ -64,6 +65,7 @@ export default function Navbar() {
           <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
             Contact
           </Link>
+          <CurrencySwitcher light={!scrolled} />
           <a
             href="https://wa.me/6282221762980"
             target="_blank"
@@ -91,6 +93,10 @@ export default function Navbar() {
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className="text-villa-dark hover:text-villa-green">Our Villas</Link>
           <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className="text-villa-dark hover:text-villa-green">Book</Link>
           <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className="text-villa-dark hover:text-villa-green">Contact</Link>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-villa-muted">Currency</span>
+            <CurrencySwitcher />
+          </div>
           <a
             href="https://wa.me/6282221762980"
             target="_blank"

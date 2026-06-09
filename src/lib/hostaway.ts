@@ -148,6 +148,25 @@ export async function getListingPricing(listingId: number): Promise<ListingPrici
   return pricing
 }
 
+// Lowest available nightly price over the next `days` days (for "from X/night").
+// Returns the EUR amount, or null if nothing is available.
+export async function getMinNightlyPrice(listingId: number, days = 120): Promise<number | null> {
+  const fmt = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+  const start = new Date()
+  const end = new Date()
+  end.setDate(end.getDate() + days)
+  try {
+    const cal = await getCalendar(listingId, fmt(start), fmt(end))
+    const prices = cal
+      .filter((d) => d.isAvailable === 1 && d.status === 'available' && d.price > 0)
+      .map((d) => d.price)
+    return prices.length ? Math.min(...prices) : null
+  } catch {
+    return null
+  }
+}
+
 // Length-of-stay discount multiplier for a given number of nights.
 export function losDiscountMultiplier(
   nights: number,

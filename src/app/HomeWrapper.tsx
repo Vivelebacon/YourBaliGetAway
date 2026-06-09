@@ -5,6 +5,8 @@ import type { VillaListItem } from '@/lib/content'
 
 const HomeClient = dynamic(() => import('./HomeClient'), { ssr: false })
 
-export default function HomeWrapper({ villas }: { villas: VillaListItem[] }) {
+export type VillaCard = VillaListItem & { fromPrice: number | null }
+
+export default function HomeWrapper({ villas }: { villas: VillaCard[] }) {
   return <HomeClient villas={villas} />
 }

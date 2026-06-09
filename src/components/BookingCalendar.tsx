@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCurrency } from './CurrencyProvider'
 
 // ── Date helpers (local, no timezone surprises) ──
 function ymd(d: Date) {
@@ -49,8 +50,8 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
     return new Date(t.getFullYear(), t.getMonth(), t.getDate())
   }, [])
 
+  const { format } = useCurrency()
   const [days, setDays] = useState<Map<string, DayInfo>>(new Map())
-  const [currency, setCurrency] = useState('USD')
   // Length-of-stay discount multipliers from Hostaway (1 = no discount).
   const [discount, setDiscount] = useState({ weekly: 1, monthly: 1 })
   const [loading, setLoading] = useState(true)
@@ -83,7 +84,6 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
         const map = new Map<string, DayInfo>()
         for (const d of data.days as DayInfo[]) map.set(d.date, d)
         setDays(map)
-        setCurrency(data.currency || 'USD')
         setDiscount({ weekly: data.weeklyDiscount ?? 1, monthly: data.monthlyDiscount ?? 1 })
       } catch (e) {
         if (!cancelled) setLoadError((e as Error).message)
@@ -133,8 +133,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
     return sum
   }, [checkIn, checkOut, nightsCount, days])
 
-  const money = (n: number) =>
-    new Intl.NumberFormat('en-US', { style: 'currency', currency, maximumFractionDigits: 0 }).format(n)
+  const money = (n: number) => format(n)
 
   // Length-of-stay discount applied to the displayed total.
   const discountMult = nightsCount >= 28 ? discount.monthly : nightsCount >= 7 ? discount.weekly : 1
@@ -261,7 +260,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
               >
                 <span>{date.getDate()}</span>
                 {selectable && info && (
-                  <span className="text-[9px] leading-none opacity-70">{Math.round(info.price)}</span>
+                  <span className="text-[9px] leading-none opacity-70">{format(info.price, { compact: true })}</span>
                 )}
               </button>
             )
