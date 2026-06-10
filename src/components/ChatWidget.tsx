@@ -3,19 +3,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 
+interface VillaCard {
+  slug: string
+  name: string
+  coverUrl: string
+  href: string
+}
+
 interface ChatMsg {
   role: 'user' | 'assistant'
   content: string
-  bookSlugs?: string[]
+  cards?: VillaCard[]
   showWhatsApp?: boolean
-}
-
-const VILLA_NAMES: Record<string, string> = {
-  'bali-bliss': 'Bali Bliss',
-  'bali-blue-1': 'Bali Blue 1',
-  'bali-blue-2': 'Bali Blue 2',
-  'bali-green': 'Bali Green',
-  'bali-sol': 'Bali Sol',
 }
 
 const WHATSAPP = 'https://wa.me/6282221762980'
@@ -23,14 +22,14 @@ const WHATSAPP = 'https://wa.me/6282221762980'
 const GREETING: ChatMsg = {
   role: 'assistant',
   content:
-    "Hi, I'm Maya from Your Bali Getaway. I can help you find the perfect villa, check dates and prices, or answer any question. What are you looking for?",
+    "Hi there! I'm Maya from Your Bali Getaway 🌴 I'd love to help you find your perfect villa. Tell me your dates and how many of you are coming, and I'll show you what's available 😊",
 }
 
 const QUICK_REPLIES = [
-  'Which villa is best for a couple?',
-  'A villa for a family of 6?',
-  'What is included?',
-  'Check availability for my dates',
+  'Best villa for a couple? 💕',
+  'A villa for 6 people 👨‍👩‍👧‍👦',
+  "What's available next week?",
+  'Show me your villas 🏝️',
 ]
 
 export default function ChatWidget() {
@@ -67,7 +66,7 @@ export default function ChatWidget() {
       if (!res.ok) throw new Error(data.error || 'Error')
       setMessages((m) => [
         ...m,
-        { role: 'assistant', content: data.reply, bookSlugs: data.bookSlugs, showWhatsApp: data.showWhatsApp },
+        { role: 'assistant', content: data.reply, cards: data.cards, showWhatsApp: data.showWhatsApp },
       ])
     } catch {
       setMessages((m) => [
@@ -131,15 +130,20 @@ export default function ChatWidget() {
                   }`}
                 >
                   {m.content}
-                  {(m.bookSlugs?.length || m.showWhatsApp) && (
+                  {(m.cards?.length || m.showWhatsApp) && (
                     <div className="mt-3 flex flex-col gap-2">
-                      {m.bookSlugs?.filter((s) => VILLA_NAMES[s]).map((s) => (
+                      {m.cards?.map((c) => (
                         <a
-                          key={s}
-                          href={`/villas/${s}#book`}
-                          className="block text-center bg-villa-green text-white text-sm font-medium py-2 rounded-lg hover:bg-villa-green-light transition-colors"
+                          key={c.slug}
+                          href={c.href}
+                          className="block rounded-xl overflow-hidden border border-stone-200 bg-white hover:shadow-md transition-shadow"
                         >
-                          Book {VILLA_NAMES[s]} →
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={c.coverUrl} alt={c.name} className="w-full h-28 object-cover" />
+                          <div className="px-3 py-2 flex items-center justify-between">
+                            <span className="font-medium text-villa-dark text-sm">{c.name}</span>
+                            <span className="text-villa-green text-sm font-medium">Book now →</span>
+                          </div>
                         </a>
                       ))}
                       {m.showWhatsApp && (

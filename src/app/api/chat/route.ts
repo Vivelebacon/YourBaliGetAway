@@ -88,8 +88,11 @@ function buildSystemPrompt(kb: string) {
   return `You are Maya, the friendly online concierge for Your Bali Getaway (yourbaligetaway.com), a collection of five private pool villas in Seminyak, Bali. Your job is to help visitors find the right villa, answer their questions, and guide them toward sending a booking request.
 
 TONE & STYLE
-- Warm, concise, human. No "Great question!" or filler. Plain sentences, no markdown asterisks or bullet symbols.
-- Short answers win. Ask one friendly follow-up if the request is vague (dates, number of guests, vibe).
+- You are super friendly, warm and helpful, like a real person who loves Bali. Sprinkle in a few tasteful emojis (1-2 per message, e.g. 🌴 😊 ✨ 🏝️) but don't overdo it.
+- Keep replies SHORT: 2-4 sentences max. No filler, no "Great question!", no markdown asterisks or bullet symbols.
+- Lead with what matters: which villa(s) fit and the price for their stay. Then invite them to book.
+- Do NOT volunteer cleaning fees, extra-guest fees, taxes or fine print unless the visitor asks. Keep the first answer light and inviting.
+- Ask one friendly follow-up if the request is vague (dates, number of guests).
 - Reply in the visitor's language.
 - Never say you are an AI, a bot, or a model. You are Maya from the team.
 
@@ -109,9 +112,10 @@ WHAT YOU MUST NEVER DO
 - If asked about any forbidden topic, politely decline ("I can only help with the villas and your stay") and steer back to helping them book.
 
 DRIVING THE BOOKING (your goal)
-- EVERY time you present or recommend a villa the guest could book, append its booking token [BOOK:slug] on its own line, using the slug (bali-bliss, bali-blue-1, bali-blue-2, bali-green, bali-sol). The site turns each token into a "Book this villa" button that opens that villa's booking calendar.
-- If you list several available villas, append one [BOOK:slug] line for EACH villa you mention, so the guest gets a book button for every option.
-- When the guest wants to talk to a human, or for anything you cannot answer, offer WhatsApp and append [WHATSAPP] on its own line.
+- When you mention available villas, give a one-line price for their stay (the accommodation total) and keep it brief. The site automatically shows a photo of each villa with a "Book" button under your message, so you don't need to describe the photo or repeat the link.
+- EVERY time you present or recommend a villa, append its token [BOOK:slug] on its own line (slugs: bali-bliss, bali-blue-1, bali-blue-2, bali-green, bali-sol). One [BOOK:slug] line per villa you mention.
+- The Book button takes them straight to that villa's booking page with their dates pre-filled, so they can book right away.
+- When the guest wants a human, or for anything you cannot answer, offer WhatsApp and append [WHATSAPP] on its own line.
 - Be helpful first, sales second. Recommend honestly based on guests and needs.
 
 VILLA KNOWLEDGE BASE
@@ -159,7 +163,7 @@ export async function POST(req: NextRequest) {
     const model = genAI.getGenerativeModel({
       model: 'gemini-2.5-flash',
       systemInstruction: buildSystemPrompt(kb),
-      generationConfig: { maxOutputTokens: 600, temperature: 0.6 },
+      generationConfig: { maxOutputTokens: 320, temperature: 0.7 },
       tools: [
         {
           functionDeclarations: [
@@ -207,6 +211,9 @@ export async function POST(req: NextRequest) {
     const chat = model.startChat({ history })
     let response = (await chat.sendMessage(last.content)).response
 
+    const DATE = /^\d{4}-\d{2}-\d{2}$/
+    let stayDates: { checkIn: string; checkOut: string } | null = null
+
     // Resolve up to 3 rounds of tool calls.
     for (let i = 0; i < 3; i++) {
       const calls = response.functionCalls?.() ?? []
@@ -218,6 +225,9 @@ export async function POST(req: NextRequest) {
           checkIn?: string
           checkOut?: string
           guests?: number
+        }
+        if (args.checkIn && args.checkOut && DATE.test(args.checkIn) && DATE.test(args.checkOut)) {
+          stayDates = { checkIn: args.checkIn, checkOut: args.checkOut }
         }
         let out: object
         if (call.name === 'check_availability') {
@@ -234,7 +244,7 @@ export async function POST(req: NextRequest) {
 
     const text = response.text() ?? ''
 
-    // Extract action tokens for the frontend (support multiple book links).
+    // Extract action tokens (support multiple villas).
     const bookSlugs: string[] = []
     const re = /\[BOOK:([a-z0-9-]+)\]/gi
     let m: RegExpExecArray | null
@@ -242,11 +252,22 @@ export async function POST(req: NextRequest) {
     const showWhatsApp = /\[WHATSAPP\]/i.test(text)
     const cleaned = text.replace(/\[BOOK:[a-z0-9-]+\]/gi, '').replace(/\[WHATSAPP\]/gi, '').trim()
 
-    return NextResponse.json({
-      reply: cleaned,
-      bookSlugs: [...new Set(bookSlugs)],
-      showWhatsApp,
-    })
+    // Build a picture card + book link (dates pre-filled) for each villa.
+    type Card = { slug: string; name: string; coverUrl: string; href: string }
+    let cards: Card[] = []
+    const unique = [...new Set(bookSlugs)]
+    if (unique.length) {
+      const list = await getVillasList()
+      const q = stayDates ? `?checkIn=${stayDates.checkIn}&checkOut=${stayDates.checkOut}` : ''
+      cards = unique
+        .map((slug): Card | null => {
+          const v = list.find((x) => x.slug === slug)
+          return v ? { slug, name: v.name, coverUrl: v.coverUrl, href: `/villas/${slug}${q}#book` } : null
+        })
+        .filter((c): c is Card => c !== null)
+    }
+
+    return NextResponse.json({ reply: cleaned, cards, showWhatsApp })
   } catch (e) {
     console.error('Chat error:', (e as Error).message)
     return NextResponse.json({ error: 'The assistant is unavailable right now.' }, { status: 502 })
