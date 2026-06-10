@@ -148,6 +148,47 @@ export async function getListingPricing(listingId: number): Promise<ListingPrici
   return pricing
 }
 
+// Guest-safe listing info for the chatbot knowledge base.
+export interface ListingGuestInfo {
+  basePrice: number
+  cleaningFee: number
+  extraPersonFee: number
+  guestsIncluded: number
+  personCapacity: number
+  checkInTime: string
+  checkOutTime: string
+  minNights: number
+  weeklyDiscount: number
+  monthlyDiscount: number
+  currency: string
+}
+
+const guestInfoCache = new Map<number, ListingGuestInfo>()
+
+export async function getListingGuestInfo(listingId: number): Promise<ListingGuestInfo> {
+  const cached = guestInfoCache.get(listingId)
+  if (cached) return cached
+  const l = await hostawayGet<Record<string, unknown>>(`/listings/${listingId}`)
+  const num = (v: unknown, d = 0) => (typeof v === 'number' ? v : d)
+  const norm = (v: unknown) => (typeof v === 'number' && v > 0 && v < 1 ? v : 1)
+  const hr = (v: unknown) => (typeof v === 'number' ? `${String(v).padStart(2, '0')}:00` : '')
+  const info: ListingGuestInfo = {
+    basePrice: num(l.price),
+    cleaningFee: num(l.cleaningFee),
+    extraPersonFee: num(l.priceForExtraPerson),
+    guestsIncluded: num(l.guestsIncluded),
+    personCapacity: num(l.personCapacity),
+    checkInTime: hr(l.checkInTimeStart),
+    checkOutTime: hr(l.checkOutTime),
+    minNights: num(l.minNights, 1),
+    weeklyDiscount: norm(l.weeklyDiscount),
+    monthlyDiscount: norm(l.monthlyDiscount),
+    currency: (l.currencyCode as string) || 'EUR',
+  }
+  guestInfoCache.set(listingId, info)
+  return info
+}
+
 // Lowest available nightly price over the next `days` days (for "from X/night").
 // Returns the EUR amount, or null if nothing is available.
 export async function getMinNightlyPrice(listingId: number, days = 120): Promise<number | null> {

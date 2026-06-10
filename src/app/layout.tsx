@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
+import ChatWidget from '@/components/ChatWidget'
 
 export const metadata: Metadata = {
   title: 'YBG Villas — Luxury Bali Retreats',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body suppressHydrationWarning>
         <CurrencyProvider>{children}</CurrencyProvider>
+        <ChatWidget />
       </body>
     </html>
   )
