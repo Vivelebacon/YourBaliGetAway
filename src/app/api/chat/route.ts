@@ -3,6 +3,7 @@ import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { getCalendar, getListingGuestInfo, losDiscountMultiplier } from '@/lib/hostaway'
 import { getHostawayListingId } from '@/lib/villas'
 import { getVillaKnowledge } from '@/lib/villaKnowledge'
+import { getVillasList } from '@/lib/content'
 
 type Msg = { role: 'user' | 'assistant'; content: string }
 
@@ -68,6 +69,21 @@ async function checkAvailability(slug: string, checkIn: string, checkOut: string
   }
 }
 
+// Availability across ALL villas for a date range (optionally filtered by guests).
+async function searchAvailability(checkIn: string, checkOut: string, guests?: number) {
+  const villas = await getVillasList()
+  const results = await Promise.all(
+    villas.map(async (v) => {
+      if (guests && v.guests < guests) {
+        return { slug: v.slug, name: v.name, available: false, reason: `Sleeps up to ${v.guests}` }
+      }
+      const a = await checkAvailability(v.slug, checkIn, checkOut)
+      return { slug: v.slug, name: v.name, capacity: v.guests, ...a }
+    }),
+  )
+  return { villas: results }
+}
+
 function buildSystemPrompt(kb: string) {
   return `You are Maya, the friendly online concierge for Your Bali Getaway (yourbaligetaway.com), a collection of five private pool villas in Seminyak, Bali. Your job is to help visitors find the right villa, answer their questions, and guide them toward sending a booking request.
 
@@ -80,7 +96,7 @@ TONE & STYLE
 WHAT YOU CAN TALK ABOUT (everything a guest should know)
 - Villa details: bedrooms, bathrooms, capacity, amenities, layout, location, the area, distances to beach/restaurants.
 - Public pricing: nightly "from" prices, cleaning fee, extra-guest fee, weekly/monthly discounts, minimum stay.
-- Availability and total price for specific dates (use the check_availability tool).
+- Availability and total price for specific dates. When the visitor asks about availability for dates WITHOUT naming a villa, call search_availability to list EVERY available villa for those dates. When they name a specific villa, use check_availability.
 - Check-in/check-out times, booking process (request to book, host confirms), payment is arranged after confirmation.
 - Prices are quoted in EUR; mention visitors can switch the display currency on the site.
 
@@ -93,7 +109,8 @@ WHAT YOU MUST NEVER DO
 - If asked about any forbidden topic, politely decline ("I can only help with the villas and your stay") and steer back to helping them book.
 
 DRIVING THE BOOKING (your goal)
-- When a villa fits the guest's needs, recommend it and invite them to send a booking request. On its own line, append a token: [BOOK:slug] using the villa's slug (bali-bliss, bali-blue-1, bali-blue-2, bali-green, bali-sol). The site turns this into a "Book this villa" button that opens the villa's booking calendar.
+- EVERY time you present or recommend a villa the guest could book, append its booking token [BOOK:slug] on its own line, using the slug (bali-bliss, bali-blue-1, bali-blue-2, bali-green, bali-sol). The site turns each token into a "Book this villa" button that opens that villa's booking calendar.
+- If you list several available villas, append one [BOOK:slug] line for EACH villa you mention, so the guest gets a book button for every option.
 - When the guest wants to talk to a human, or for anything you cannot answer, offer WhatsApp and append [WHATSAPP] on its own line.
 - Be helpful first, sales second. Recommend honestly based on guests and needs.
 
@@ -149,7 +166,7 @@ export async function POST(req: NextRequest) {
             {
               name: 'check_availability',
               description:
-                'Check whether a villa is available for specific dates and get the total accommodation price. Use when the visitor gives or asks about specific dates.',
+                'Check whether ONE specific villa is available for dates and get its total price. Use when the visitor names a villa.',
               parameters: {
                 type: SchemaType.OBJECT,
                 properties: {
@@ -161,6 +178,20 @@ export async function POST(req: NextRequest) {
                   checkOut: { type: SchemaType.STRING, description: 'Check-out date, YYYY-MM-DD' },
                 },
                 required: ['villa', 'checkIn', 'checkOut'],
+              },
+            },
+            {
+              name: 'search_availability',
+              description:
+                'List ALL villas that are available for a date range, with prices. Use when the visitor asks about availability for dates without naming a specific villa.',
+              parameters: {
+                type: SchemaType.OBJECT,
+                properties: {
+                  checkIn: { type: SchemaType.STRING, description: 'Check-in date, YYYY-MM-DD' },
+                  checkOut: { type: SchemaType.STRING, description: 'Check-out date, YYYY-MM-DD' },
+                  guests: { type: SchemaType.NUMBER, description: 'Number of guests (optional)' },
+                },
+                required: ['checkIn', 'checkOut'],
               },
             },
           ],
@@ -182,11 +213,20 @@ export async function POST(req: NextRequest) {
       if (calls.length === 0) break
       const parts = []
       for (const call of calls) {
-        const args = (call.args ?? {}) as { villa?: string; checkIn?: string; checkOut?: string }
-        const out =
-          call.name === 'check_availability'
-            ? await checkAvailability(args.villa ?? '', args.checkIn ?? '', args.checkOut ?? '')
-            : { error: 'Unknown function' }
+        const args = (call.args ?? {}) as {
+          villa?: string
+          checkIn?: string
+          checkOut?: string
+          guests?: number
+        }
+        let out: object
+        if (call.name === 'check_availability') {
+          out = await checkAvailability(args.villa ?? '', args.checkIn ?? '', args.checkOut ?? '')
+        } else if (call.name === 'search_availability') {
+          out = await searchAvailability(args.checkIn ?? '', args.checkOut ?? '', args.guests)
+        } else {
+          out = { error: 'Unknown function' }
+        }
         parts.push({ functionResponse: { name: call.name, response: out } })
       }
       response = (await chat.sendMessage(parts)).response
@@ -194,14 +234,17 @@ export async function POST(req: NextRequest) {
 
     const text = response.text() ?? ''
 
-    // Extract action tokens for the frontend.
-    const bookMatch = text.match(/\[BOOK:([a-z0-9-]+)\]/i)
+    // Extract action tokens for the frontend (support multiple book links).
+    const bookSlugs: string[] = []
+    const re = /\[BOOK:([a-z0-9-]+)\]/gi
+    let m: RegExpExecArray | null
+    while ((m = re.exec(text))) bookSlugs.push(m[1])
     const showWhatsApp = /\[WHATSAPP\]/i.test(text)
     const cleaned = text.replace(/\[BOOK:[a-z0-9-]+\]/gi, '').replace(/\[WHATSAPP\]/gi, '').trim()
 
     return NextResponse.json({
       reply: cleaned,
-      bookSlug: bookMatch ? bookMatch[1] : null,
+      bookSlugs: [...new Set(bookSlugs)],
       showWhatsApp,
     })
   } catch (e) {

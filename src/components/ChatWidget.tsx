@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation'
 interface ChatMsg {
   role: 'user' | 'assistant'
   content: string
-  bookSlug?: string | null
+  bookSlugs?: string[]
   showWhatsApp?: boolean
 }
 
@@ -67,7 +67,7 @@ export default function ChatWidget() {
       if (!res.ok) throw new Error(data.error || 'Error')
       setMessages((m) => [
         ...m,
-        { role: 'assistant', content: data.reply, bookSlug: data.bookSlug, showWhatsApp: data.showWhatsApp },
+        { role: 'assistant', content: data.reply, bookSlugs: data.bookSlugs, showWhatsApp: data.showWhatsApp },
       ])
     } catch {
       setMessages((m) => [
@@ -100,8 +100,12 @@ export default function ChatWidget() {
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={1.6} viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M8 10h.01M12 10h.01M16 10h.01M21 12a8 8 0 01-11.6 7.1L3 21l1.9-6.4A8 8 0 1121 12z" />
+          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.9 48.9 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z"
+            />
           </svg>
         )}
       </button>
@@ -127,16 +131,17 @@ export default function ChatWidget() {
                   }`}
                 >
                   {m.content}
-                  {(m.bookSlug || m.showWhatsApp) && (
+                  {(m.bookSlugs?.length || m.showWhatsApp) && (
                     <div className="mt-3 flex flex-col gap-2">
-                      {m.bookSlug && VILLA_NAMES[m.bookSlug] && (
+                      {m.bookSlugs?.filter((s) => VILLA_NAMES[s]).map((s) => (
                         <a
-                          href={`/villas/${m.bookSlug}#book`}
+                          key={s}
+                          href={`/villas/${s}#book`}
                           className="block text-center bg-villa-green text-white text-sm font-medium py-2 rounded-lg hover:bg-villa-green-light transition-colors"
                         >
-                          Book {VILLA_NAMES[m.bookSlug]} →
+                          Book {VILLA_NAMES[s]} →
                         </a>
-                      )}
+                      ))}
                       {m.showWhatsApp && (
                         <a
                           href={WHATSAPP}
