@@ -26,10 +26,10 @@ const GREETING: ChatMsg = {
 }
 
 const QUICK_REPLIES = [
-  'Best villa for a couple? 💕',
-  'A villa for 6 people 👨‍👩‍👧‍👦',
-  "What's available next week?",
-  'Show me your villas 🏝️',
+  'Check availability for my dates',
+  'Best villa for a couple',
+  'A villa for a group',
+  'What makes your villas special',
 ]
 
 export default function ChatWidget() {
