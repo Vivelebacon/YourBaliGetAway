@@ -91,21 +91,26 @@ export default function ChatWidget() {
       {/* Launcher */}
       <button
         onClick={() => setOpen((o) => !o)}
-        aria-label="Chat with us"
-        className="fixed bottom-5 right-5 z-[60] w-14 h-14 rounded-full bg-villa-green text-white shadow-lg flex items-center justify-center hover:bg-villa-green-light transition-colors"
+        aria-label={open ? 'Close chat' : 'Open chat'}
+        className={`fixed bottom-5 right-5 z-[60] shadow-lg bg-villa-green text-white hover:bg-villa-green-light transition-colors flex items-center ${
+          open ? 'w-14 h-14 rounded-full justify-center' : 'gap-2.5 rounded-full pl-4 pr-5 py-3 max-w-[calc(100vw-2.5rem)]'
+        }`}
       >
         {open ? (
           <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         ) : (
-          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.9 48.9 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z"
-            />
-          </svg>
+          <>
+            <svg className="w-7 h-7 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.9 48.9 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z"
+              />
+            </svg>
+            <span className="text-sm font-medium whitespace-nowrap">Need help choosing your villa?</span>
+          </>
         )}
       </button>
 
