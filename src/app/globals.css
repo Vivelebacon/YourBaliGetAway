@@ -23,6 +23,33 @@ h1, h2, h3, h4 {
   font-family: var(--font-cormorant);
 }
 
+::selection {
+  background: #3d5a3e;
+  color: #faf7f2;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #faf7f2;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d0c4;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #c9a84c;
+}
+
+/* Visible focus for keyboard navigation, on-brand */
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid #c9a84c;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
 /* Booking form inputs */
 .input {
   width: 100%;
