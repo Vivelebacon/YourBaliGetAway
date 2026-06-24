@@ -124,7 +124,7 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
                   <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
                   <div className="absolute bottom-4 left-4 right-4">
                     <div className="flex flex-wrap gap-1">
-                      {villa.highlights.slice(0, 2).map((h) => (
+                      {villa.highlights.slice(0, 3).map((h) => (
                         <span key={h} className="bg-white/20 backdrop-blur-sm text-white text-xs px-2 py-0.5 rounded-full border border-white/30">
                           {h}
                         </span>
