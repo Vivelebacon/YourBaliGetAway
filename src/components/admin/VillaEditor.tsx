@@ -25,6 +25,7 @@ export default function VillaEditor({ villa, initialImages, initialReviews }: Pr
     guests: villa.guests,
     rating: villa.rating ?? 0,
     review_count: villa.review_count,
+    preview_highlights_count: villa.preview_highlights_count ?? 3,
   })
   const [highlights, setHighlights] = useState<string[]>(villa.highlights ?? [])
   const [amenities, setAmenities] = useState<string[]>(villa.amenities ?? [])
@@ -54,6 +55,7 @@ export default function VillaEditor({ villa, initialImages, initialReviews }: Pr
         guests: Number(form.guests),
         rating: Number(form.rating),
         review_count: Number(form.review_count),
+        preview_highlights_count: Math.max(0, Number(form.preview_highlights_count) || 0),
         highlights: highlights.map((h) => h.trim()).filter(Boolean),
         amenities: amenities.map((a) => a.trim()).filter(Boolean),
         updated_at: new Date().toISOString(),
@@ -133,6 +135,23 @@ export default function VillaEditor({ villa, initialImages, initialReviews }: Pr
         </div>
 
         <TagEditor label="Highlights" items={highlights} setItems={setHighlights} />
+
+        <div className="mt-4 max-w-xs">
+          <Field label="Highlights shown on landing preview">
+            <input
+              type="number"
+              min={0}
+              max={highlights.length}
+              className="input"
+              value={form.preview_highlights_count}
+              onChange={(e) => setForm({ ...form, preview_highlights_count: Number(e.target.value) })}
+            />
+          </Field>
+          <p className="text-xs text-villa-muted mt-1">
+            How many highlight pills appear on the home page card (in list order). The villa page always shows all of them.
+          </p>
+        </div>
+
         <TagEditor label="Amenities" items={amenities} setItems={setAmenities} />
 
         <button

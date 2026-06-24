@@ -32,6 +32,7 @@ export interface VillaListItem {
   bathrooms: number
   guests: number
   rating: number
+  previewHighlightsCount: number
 }
 
 export interface VillaDetail extends VillaListItem {
@@ -55,6 +56,7 @@ interface VillaRow {
   highlights: string[] | null
   amenities: string[] | null
   cover_image: string | null
+  preview_highlights_count: number | null
 }
 
 function toListItem(r: VillaRow): VillaListItem {
@@ -68,13 +70,14 @@ function toListItem(r: VillaRow): VillaListItem {
     bathrooms: r.bathrooms,
     guests: r.guests,
     rating: r.rating ?? 0,
+    previewHighlightsCount: r.preview_highlights_count ?? 3,
   }
 }
 
 export async function getVillasList(): Promise<VillaListItem[]> {
   const { data, error } = await supabase
     .from('villas')
-    .select('slug,name,subtitle,cover_image,highlights,bedrooms,bathrooms,guests,rating')
+    .select('slug,name,subtitle,cover_image,highlights,bedrooms,bathrooms,guests,rating,preview_highlights_count')
     .order('sort_order', { ascending: true })
   if (error || !data) return []
   return (data as VillaRow[]).map(toListItem)

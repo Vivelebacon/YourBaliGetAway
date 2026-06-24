@@ -58,4 +58,5 @@ export interface VillaRow {
   highlights: string[] | null
   amenities: string[] | null
   cover_image: string | null
+  preview_highlights_count: number | null
 }
