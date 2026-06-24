@@ -54,7 +54,6 @@ export default async function VillaPage({ params }: Props) {
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-6 pt-16">
           <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">YBG Villas</p>
           <h1 className="font-serif text-5xl md:text-7xl text-white font-light mb-3">{villa.name}</h1>
-          <p className="text-stone-200 text-lg font-light">{villa.subtitle}</p>
           {/* Rating */}
           <div className="flex items-center gap-2 mt-4 text-white/80 text-sm">
             <span className="text-villa-gold">★</span>
@@ -74,6 +73,9 @@ export default async function VillaPage({ params }: Props) {
       <section className="py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div>
+            {villa.subtitle && (
+              <p className="text-villa-green text-lg font-light italic mb-6">{villa.subtitle}</p>
+            )}
             <div className="flex gap-8 mb-8">
               <Stat label="Bedrooms" value={String(villa.bedrooms)} />
               <Stat label="Bathrooms" value={String(villa.bathrooms)} />
