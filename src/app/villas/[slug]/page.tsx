@@ -40,6 +40,7 @@ export default async function VillaPage({ params }: Props) {
   const listingId = getHostawayListingId(slug)
   const others = (await getVillasList()).filter((v) => v.slug !== slug).slice(0, 3)
 
+  const descIsHtml = /<[a-z][\s\S]*>/i.test(villa.description)
   const descParagraphs = villa.description.split('\n\n').filter(Boolean)
 
   return (
@@ -78,11 +79,18 @@ export default async function VillaPage({ params }: Props) {
               <Stat label="Bathrooms" value={String(villa.bathrooms)} />
               <Stat label="Guests" value={`Up to ${villa.guests}`} />
             </div>
-            <div className="space-y-4">
-              {descParagraphs.map((p, i) => (
-                <p key={i} className="text-stone-600 leading-relaxed font-light">{p}</p>
-              ))}
-            </div>
+            {descIsHtml ? (
+              <div
+                className="prose prose-stone max-w-none text-stone-600 font-light prose-headings:font-serif prose-headings:text-villa-dark prose-headings:font-light prose-a:text-villa-green"
+                dangerouslySetInnerHTML={{ __html: villa.description }}
+              />
+            ) : (
+              <div className="space-y-4">
+                {descParagraphs.map((p, i) => (
+                  <p key={i} className="text-stone-600 leading-relaxed font-light">{p}</p>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Amenities */}

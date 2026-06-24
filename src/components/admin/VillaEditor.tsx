@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { pushLive, type ImageRow, type ReviewRow, type VillaRow } from '@/lib/admin'
 import GalleryManager from './GalleryManager'
+import RichTextEditor from './RichTextEditor'
 
 interface Props {
   villa: VillaRow
@@ -106,10 +107,9 @@ export default function VillaEditor({ villa, initialImages, initialReviews }: Pr
           </Field>
           <div className="md:col-span-2">
             <Field label="Description">
-              <textarea
-                className="input min-h-[160px]"
+              <RichTextEditor
                 value={form.description}
-                onChange={(e) => setForm({ ...form, description: e.target.value })}
+                onChange={(html) => setForm({ ...form, description: html })}
               />
             </Field>
           </div>
