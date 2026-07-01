@@ -172,8 +172,7 @@ export async function POST(req: NextRequest) {
   }
 
   const apiKey = process.env.OPENROUTER_API_KEY
-  console.log('[chat] OPENROUTER_API_KEY present:', !!apiKey, 'length:', apiKey?.length ?? 0)
-  if (!apiKey) {
+if (!apiKey) {
     return NextResponse.json({ error: 'Chat is not configured.' }, { status: 500 })
   }
 
