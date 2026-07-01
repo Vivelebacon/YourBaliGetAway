@@ -25,7 +25,7 @@ interface CinemaScrollHeroProps {
 const pad4 = (n: number) => String(n).padStart(4, '0')
 
 export default function CinemaScrollHero({
-  frameCount = 246,
+  frameCount = 244,
   framePath = (i) => `/hero-seq/frame_${pad4(i)}.webp`,
   title = 'Your Bali Getaway',
   kicker = 'Bali, Indonesia',

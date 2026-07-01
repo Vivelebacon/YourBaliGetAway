@@ -84,9 +84,9 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
     <div ref={rootRef} className="min-h-screen bg-villa-cream">
       <Navbar />
 
-      {/* ── Hero (scroll-scrubbed 4K: V3 villa→cinema, V4 zoom, V2 immersive enter→pool) ── */}
+      {/* ── Hero (scroll-scrubbed 4K: V3 villa→cinema, V5 zoom, V2 immersive enter→pool) ── */}
       <CinemaScrollHero
-        frameCount={246}
+        frameCount={244}
         scrollLengthVh={340}
         title="Your Bali Getaway"
         kicker="Bali, Indonesia"
