@@ -7,7 +7,7 @@ import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
-import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
+import CinemaScrollHero from '@/components/blocks/cinema-scroll-hero'
 import { useCurrency } from '@/components/CurrencyProvider'
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
 import type { VillaCard } from './HomeWrapper'
@@ -84,19 +84,18 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
     <div ref={rootRef} className="min-h-screen bg-villa-cream">
       <Navbar />
 
-      {/* ── Hero (scroll-expand) ── */}
-      <ScrollExpandMedia
-        mediaType="video"
-        mediaSrc="/hero.mp4"
-        bgImageSrc="/hero1.jpg"
+      {/* ── Hero (scroll-scrubbed 4K: V3 villa→cinema, V4 zoom, V2 immersive enter→pool) ── */}
+      <CinemaScrollHero
+        frameCount={246}
+        scrollLengthVh={340}
         title="Your Bali Getaway"
-        date="Bali, Indonesia"
-        scrollToExpand="Scroll to explore"
+        kicker="Bali, Indonesia"
+        scrollHint="Scroll to explore"
       />
 
 
       {/* ── Villa Collection ── */}
-      <section id="villas" className="py-24 px-6">
+      <section id="villas" data-nav-light-bg className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="reveal-heading text-center mb-16">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">The Collection</p>
@@ -180,7 +179,7 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
       </section>
 
       {/* ── Booking Widget ── */}
-      <section id="book" className="py-24 px-6">
+      <section id="book" data-nav-light-bg className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="reveal-heading text-center mb-12">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
@@ -196,7 +195,7 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
       </section>
 
       {/* ── Reviews Carousel ── */}
-      <section className="py-24 px-6 bg-villa-cream">
+      <section data-nav-light-bg className="py-24 px-6 bg-villa-cream">
         <div className="max-w-5xl mx-auto">
           <div className="reveal-heading text-center mb-16">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Guest Experiences</p>

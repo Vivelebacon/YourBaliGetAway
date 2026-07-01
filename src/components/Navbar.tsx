@@ -8,14 +8,30 @@ import CurrencySwitcher from './CurrencySwitcher'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
-  const [scrolled, setScrolled] = useState(false)
+  const [darkText, setDarkText] = useState(false)
   const pathname = usePathname()
 
+  // The header is transparent at all times (never a solid bar). Over light-background
+  // sections (tagged data-nav-light-bg) the text flips to dark so it stays readable;
+  // over the hero and dark sections it keeps white text on a soft top scrim.
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 80)
+    const sample = 60 // px below the top of the viewport
+    const onScroll = () => {
+      let dark = false
+      document.querySelectorAll<HTMLElement>('[data-nav-light-bg]').forEach((el) => {
+        const r = el.getBoundingClientRect()
+        if (r.top <= sample && r.bottom >= sample) dark = true
+      })
+      setDarkText(dark)
+    }
+    onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [pathname])
 
   // On the homepage the hero locks scrolling until its animation completes.
   // Clicking a section link should release the hero and jump to the section.
@@ -29,8 +45,7 @@ export default function Navbar() {
     }, 80)
   }
 
-  // Home: on the homepage, reset the hero to its initial state at the very top
-  // (before the animation). On other pages, let the Link navigate to "/".
+  // Home: on the homepage, reset the hero to its initial state at the very top.
   function goHome(e: React.MouseEvent) {
     setOpen(false)
     if (pathname !== '/') return
@@ -38,34 +53,43 @@ export default function Navbar() {
     window.dispatchEvent(new CustomEvent('hero:reset'))
   }
 
+  const linkClass = darkText
+    ? 'text-sm transition-colors text-villa-dark hover:text-villa-green'
+    : 'text-sm transition-colors text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'
+
   return (
-    <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-stone-200' : 'bg-gradient-to-b from-black/55 via-black/25 to-transparent'}`}>
-      <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+        darkText ? 'bg-transparent' : 'bg-gradient-to-b from-black/55 via-black/25 to-transparent'
+      }`}
+    >
+      <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
         <Link href="/" onClick={goHome}>
           <Image
             src="/logo_transparent.png"
             alt="YBG Villas"
-            width={140}
-            height={70}
-            className="object-contain w-auto h-[70px]"
+            width={168}
+            height={84}
+            className="object-contain w-auto h-[84px]"
+            priority
           />
         </Link>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" onClick={goHome} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
+          <Link href="/" onClick={goHome} className={linkClass}>
             Home
           </Link>
-          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
+          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={linkClass}>
             Our Villas
           </Link>
-          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
+          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={linkClass}>
             Book
           </Link>
-          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={`text-sm transition-colors ${scrolled ? 'text-villa-dark hover:text-villa-green' : 'text-white hover:text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]'}`}>
+          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={linkClass}>
             Contact
           </Link>
-          <CurrencySwitcher light={!scrolled} />
+          <CurrencySwitcher light={!darkText} />
           <a
             href="https://wa.me/6282221762980"
             target="_blank"
@@ -79,9 +103,9 @@ export default function Navbar() {
         {/* Mobile menu button */}
         <button className="md:hidden p-2" onClick={() => setOpen(!open)} aria-label="Menu">
           <div className="space-y-1.5">
-            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? 'rotate-45 translate-y-2' : ''}`} />
-            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? 'opacity-0' : ''}`} />
-            <span className={`block w-6 h-0.5 transition-all ${scrolled ? 'bg-villa-dark' : 'bg-white'} ${open ? '-rotate-45 -translate-y-2' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${darkText ? 'bg-villa-dark' : 'bg-white'} ${open ? 'rotate-45 translate-y-2' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${darkText ? 'bg-villa-dark' : 'bg-white'} ${open ? 'opacity-0' : ''}`} />
+            <span className={`block w-6 h-0.5 transition-all ${darkText ? 'bg-villa-dark' : 'bg-white'} ${open ? '-rotate-45 -translate-y-2' : ''}`} />
           </div>
         </button>
       </div>

@@ -70,7 +70,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       {/* ── Stats + Description ── */}
-      <section className="py-16 px-6">
+      <section data-nav-light-bg className="py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           <div>
             {villa.subtitle && (
@@ -111,7 +111,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       {/* ── Booking Widget ── */}
-      <section id="book" className="py-20 px-6">
+      <section id="book" data-nav-light-bg className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
             <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
@@ -125,7 +125,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       {/* ── Gallery ── */}
-      <section className="px-6 pb-16">
+      <section data-nav-light-bg className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-3xl text-villa-dark mb-8">Gallery</h2>
           <Gallery images={villa.images} />
@@ -133,7 +133,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       {/* ── Reviews ── */}
-      <section className="bg-white py-20 px-6">
+      <section data-nav-light-bg className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-baseline gap-4 mb-10">
             <h2 className="font-serif text-3xl text-villa-dark">Guest Reviews</h2>
@@ -162,7 +162,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       {/* ── Other Villas ── */}
-      <section className="bg-white py-20 px-6">
+      <section data-nav-light-bg className="bg-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
           <h2 className="font-serif text-3xl text-villa-dark mb-10">You Might Also Like</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
