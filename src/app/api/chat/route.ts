@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { GoogleGenerativeAI, SchemaType } from '@google/generative-ai'
 import { getCalendar, getListingGuestInfo, losDiscountMultiplier } from '@/lib/hostaway'
 import { getHostawayListingId } from '@/lib/villas'
 import { getVillaKnowledge } from '@/lib/villaKnowledge'
@@ -27,7 +26,6 @@ function ymd(d: Date) {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
 }
 
-// Availability + price for specific dates (the bot's one tool).
 async function checkAvailability(slug: string, checkIn: string, checkOut: string) {
   const listingId = getHostawayListingId(slug)
   if (!listingId) return { error: 'Unknown villa' }
@@ -69,7 +67,6 @@ async function checkAvailability(slug: string, checkIn: string, checkOut: string
   }
 }
 
-// Availability across ALL villas for a date range (optionally filtered by guests).
 async function searchAvailability(checkIn: string, checkOut: string, guests?: number) {
   const villas = await getVillasList()
   const results = await Promise.all(
@@ -124,6 +121,49 @@ ${kb}
 Today's date is ${ymd(new Date())}.`
 }
 
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions'
+const MODEL = 'minimax/minimax-m3'
+
+const TOOLS = [
+  {
+    type: 'function',
+    function: {
+      name: 'check_availability',
+      description:
+        'Check whether ONE specific villa is available for dates and get its total price. Use when the visitor names a villa.',
+      parameters: {
+        type: 'object',
+        properties: {
+          villa: {
+            type: 'string',
+            description: 'Villa slug: bali-bliss, bali-blue-1, bali-blue-2, bali-green, or bali-sol',
+          },
+          checkIn: { type: 'string', description: 'Check-in date, YYYY-MM-DD' },
+          checkOut: { type: 'string', description: 'Check-out date, YYYY-MM-DD' },
+        },
+        required: ['villa', 'checkIn', 'checkOut'],
+      },
+    },
+  },
+  {
+    type: 'function',
+    function: {
+      name: 'search_availability',
+      description:
+        'List ALL villas that are available for a date range, with prices. Use when the visitor asks about availability for dates without naming a specific villa.',
+      parameters: {
+        type: 'object',
+        properties: {
+          checkIn: { type: 'string', description: 'Check-in date, YYYY-MM-DD' },
+          checkOut: { type: 'string', description: 'Check-out date, YYYY-MM-DD' },
+          guests: { type: 'number', description: 'Number of guests (optional)' },
+        },
+        required: ['checkIn', 'checkOut'],
+      },
+    },
+  },
+]
+
 export async function POST(req: NextRequest) {
   const ip =
     req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
@@ -131,7 +171,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Too many messages. Please try again later.' }, { status: 429 })
   }
 
-  const apiKey = process.env.GEMINI_API_KEY
+  const apiKey = process.env.OPENROUTER_API_KEY
   if (!apiKey) {
     return NextResponse.json({ error: 'Chat is not configured.' }, { status: 500 })
   }
@@ -159,90 +199,80 @@ export async function POST(req: NextRequest) {
 
   try {
     const kb = await getVillaKnowledge()
-    const genAI = new GoogleGenerativeAI(apiKey)
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-2.5-flash',
-      systemInstruction: buildSystemPrompt(kb),
-      generationConfig: { maxOutputTokens: 320, temperature: 0.7 },
-      tools: [
-        {
-          functionDeclarations: [
-            {
-              name: 'check_availability',
-              description:
-                'Check whether ONE specific villa is available for dates and get its total price. Use when the visitor names a villa.',
-              parameters: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  villa: {
-                    type: SchemaType.STRING,
-                    description: 'Villa slug: bali-bliss, bali-blue-1, bali-blue-2, bali-green, or bali-sol',
-                  },
-                  checkIn: { type: SchemaType.STRING, description: 'Check-in date, YYYY-MM-DD' },
-                  checkOut: { type: SchemaType.STRING, description: 'Check-out date, YYYY-MM-DD' },
-                },
-                required: ['villa', 'checkIn', 'checkOut'],
-              },
-            },
-            {
-              name: 'search_availability',
-              description:
-                'List ALL villas that are available for a date range, with prices. Use when the visitor asks about availability for dates without naming a specific villa.',
-              parameters: {
-                type: SchemaType.OBJECT,
-                properties: {
-                  checkIn: { type: SchemaType.STRING, description: 'Check-in date, YYYY-MM-DD' },
-                  checkOut: { type: SchemaType.STRING, description: 'Check-out date, YYYY-MM-DD' },
-                  guests: { type: SchemaType.NUMBER, description: 'Number of guests (optional)' },
-                },
-                required: ['checkIn', 'checkOut'],
-              },
-            },
-          ],
-        },
-      ],
-    })
 
-    const history = messages.slice(0, -1).map((m) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }],
-    }))
-
-    const chat = model.startChat({ history })
-    let response = (await chat.sendMessage(last.content)).response
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    type OAIMsg = Record<string, any>
+    const msgs: OAIMsg[] = [
+      { role: 'system', content: buildSystemPrompt(kb) },
+      ...messages.map((m) => ({ role: m.role, content: m.content })),
+    ]
 
     const DATE = /^\d{4}-\d{2}-\d{2}$/
     let stayDates: { checkIn: string; checkOut: string } | null = null
+    let text = ''
 
     // Resolve up to 3 rounds of tool calls.
-    for (let i = 0; i < 3; i++) {
-      const calls = response.functionCalls?.() ?? []
-      if (calls.length === 0) break
-      const parts = []
-      for (const call of calls) {
-        const args = (call.args ?? {}) as {
-          villa?: string
-          checkIn?: string
-          checkOut?: string
-          guests?: number
-        }
+    for (let i = 0; i <= 3; i++) {
+      const res = await fetch(OPENROUTER_URL, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: msgs,
+          tools: TOOLS,
+          max_tokens: 320,
+          temperature: 0.7,
+        }),
+      })
+
+      if (!res.ok) {
+        const err = await res.text()
+        console.error('OpenRouter error:', err)
+        throw new Error(`OpenRouter ${res.status}`)
+      }
+
+      const data = await res.json()
+      const choice = data.choices?.[0]
+      if (!choice) throw new Error('No response from model')
+
+      const msg = choice.message
+      msgs.push(msg)
+
+      if (choice.finish_reason !== 'tool_calls' || !msg.tool_calls?.length || i === 3) {
+        text = msg.content ?? ''
+        break
+      }
+
+      // Execute tool calls and append results.
+      for (const call of msg.tool_calls) {
+        const args =
+          typeof call.function.arguments === 'string'
+            ? JSON.parse(call.function.arguments)
+            : call.function.arguments
+
         if (args.checkIn && args.checkOut && DATE.test(args.checkIn) && DATE.test(args.checkOut)) {
           stayDates = { checkIn: args.checkIn, checkOut: args.checkOut }
         }
+
         let out: object
-        if (call.name === 'check_availability') {
+        if (call.function.name === 'check_availability') {
           out = await checkAvailability(args.villa ?? '', args.checkIn ?? '', args.checkOut ?? '')
-        } else if (call.name === 'search_availability') {
+        } else if (call.function.name === 'search_availability') {
           out = await searchAvailability(args.checkIn ?? '', args.checkOut ?? '', args.guests)
         } else {
           out = { error: 'Unknown function' }
         }
-        parts.push({ functionResponse: { name: call.name, response: out } })
-      }
-      response = (await chat.sendMessage(parts)).response
-    }
 
-    const text = response.text() ?? ''
+        msgs.push({
+          role: 'tool',
+          tool_call_id: call.id,
+          content: JSON.stringify(out),
+        })
+      }
+    }
 
     // Extract action tokens (support multiple villas).
     const bookSlugs: string[] = []
@@ -252,7 +282,6 @@ export async function POST(req: NextRequest) {
     const showWhatsApp = /\[WHATSAPP\]/i.test(text)
     const cleaned = text.replace(/\[BOOK:[a-z0-9-]+\]/gi, '').replace(/\[WHATSAPP\]/gi, '').trim()
 
-    // Build a picture card + book link (dates pre-filled) for each villa.
     type Card = { slug: string; name: string; coverUrl: string; href: string }
     let cards: Card[] = []
     const unique = [...new Set(bookSlugs)]
