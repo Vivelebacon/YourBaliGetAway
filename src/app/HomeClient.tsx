@@ -106,12 +106,11 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {villas.map((villa) => (
-              <Link
+              <div
                 key={villa.slug}
-                href={`/villas/${villa.slug}`}
-                className="villa-card group bg-white rounded-2xl overflow-hidden border border-transparent shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-villa-gold/30 hover:shadow-[0_24px_50px_-18px_rgba(61,90,62,0.35)]"
+                className="villa-card group flex flex-col bg-white rounded-2xl overflow-hidden border border-transparent shadow-sm transition-all duration-500 ease-out hover:-translate-y-1.5 hover:border-villa-gold/30 hover:shadow-[0_24px_50px_-18px_rgba(61,90,62,0.35)]"
               >
-                <div className="relative h-64 overflow-hidden">
+                <Link href={`/villas/${villa.slug}`} className="relative block h-64 overflow-hidden">
                   <div className="villa-card-media absolute inset-0 scale-[1.16] will-change-transform">
                     <Image
                       src={villa.coverUrl}
@@ -130,10 +129,12 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
                       ))}
                     </div>
                   </div>
-                </div>
-                <div className="p-6">
+                </Link>
+                <div className="p-6 flex flex-1 flex-col">
                   <div className="flex items-start justify-between mb-1">
-                    <h3 className="font-serif text-2xl text-villa-dark transition-colors duration-300 group-hover:text-villa-green">{villa.name}</h3>
+                    <Link href={`/villas/${villa.slug}`}>
+                      <h3 className="font-serif text-2xl text-villa-dark transition-colors duration-300 group-hover:text-villa-green">{villa.name}</h3>
+                    </Link>
                     <span className="text-villa-gold text-sm flex items-center gap-1">★ {villa.rating}</span>
                   </div>
                   <p className="text-villa-muted text-sm mb-4">{villa.subtitle}</p>
@@ -149,12 +150,23 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
                       <span className="text-xs text-villa-muted"> / night</span>
                     </p>
                   )}
-                  <span className="text-villa-green text-sm font-medium inline-flex items-center gap-1">
-                    View Villa
-                    <span className="inline-block transition-transform duration-300 group-hover:translate-x-1.5" aria-hidden="true">→</span>
-                  </span>
+                  <div className="mt-auto flex items-center gap-3 pt-1">
+                    <Link
+                      href={`/villas/${villa.slug}#book`}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-villa-green px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light"
+                    >
+                      Check availability
+                    </Link>
+                    <Link
+                      href={`/villas/${villa.slug}`}
+                      className="group/view text-villa-green text-sm font-medium inline-flex items-center gap-1 whitespace-nowrap"
+                    >
+                      View villa
+                      <span className="inline-block transition-transform duration-300 group-hover/view:translate-x-1" aria-hidden="true">→</span>
+                    </Link>
+                  </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
