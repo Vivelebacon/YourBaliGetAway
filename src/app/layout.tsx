@@ -4,12 +4,13 @@ import { CurrencyProvider } from '@/components/CurrencyProvider'
 import ChatWidget from '@/components/ChatWidget'
 
 export const metadata: Metadata = {
-  title: 'YBG Villas — Luxury Bali Retreats',
+  title: 'Luxury Private Pool Villas in Bali | Your Bali Getaway',
   description:
-    'Discover five exceptional private pool villas in Bali. Book your luxury escape directly — no fees, instant confirmation.',
+    'Book one of five private pool villas in Bali direct with the host. No platform fees, best rates, and instant WhatsApp confirmation for your luxury Bali stay.',
   openGraph: {
-    title: 'YBG Villas — Luxury Bali Retreats',
-    description: 'Five private pool villas in Bali. Book direct.',
+    title: 'Luxury Private Pool Villas in Bali | Your Bali Getaway',
+    description:
+      'Five private pool villas in Bali, booked direct with the host. No fees, best rates, instant confirmation.',
     images: ['/images/bali-sol/Exterior/Exterior_01.jpeg'],
   },
 }
