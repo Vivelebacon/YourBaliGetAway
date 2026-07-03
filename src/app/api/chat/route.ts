@@ -171,8 +171,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Too many messages. Please try again later.' }, { status: 429 })
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY
-if (!apiKey) {
+  // Strip any invisible junk (BOM ﻿, stray whitespace/newlines) that can sneak
+  // into the env var when it is pasted/saved on Windows. A BOM in the key makes the
+  // Authorization header impossible to encode and throws on every request.
+  const apiKey = process.env.OPENROUTER_API_KEY?.replace(/[^\x20-\x7E]/g, '').trim()
+  if (!apiKey) {
     return NextResponse.json({ error: 'Chat is not configured.' }, { status: 500 })
   }
 
