@@ -89,6 +89,7 @@ async function findSplitStay(checkIn: string, checkOut: string, guests?: number)
   const end = Date.parse(checkOut)
   const nights = Math.round((end - start) / 86_400_000)
   if (!Number.isFinite(nights) || nights <= 0) return { error: 'Invalid dates' }
+  if (nights > 120) return { error: 'Range too long to plan a split stay; please ask about up to ~4 months.' }
 
   // One entry per night of the stay (checkout morning is not a night).
   const nightDates: string[] = []
@@ -128,8 +129,11 @@ async function findSplitStay(checkIn: string, checkOut: string, guests?: number)
     )
   ).filter((r): r is Row => r !== null)
 
-  // Greedy minimum-move cover: at each open night, take the villa whose available
-  // run reaches furthest (and is long enough for its own minimum stay).
+  // Minimum-move cover via DP. A simple "grab the villa reaching furthest" greedy
+  // is WRONG once villas have a minimum stay: taking a villa's full run can strand
+  // the last nights below another villa's minimum. The DP considers ending a leg
+  // early (any valid length from minNights up to the villa's contiguous run), so it
+  // finds a gap-free combination whenever one exists.
   type Seg = {
     slug: string
     name: string
@@ -138,41 +142,65 @@ async function findSplitStay(checkIn: string, checkOut: string, guests?: number)
     nights: number
     accommodationTotal: number
   }
-  const segments: Seg[] = []
-  let i = 0
-  while (i < nights) {
-    let best: Row | null = null
-    let bestEnd = i
+  const N = nights
+  // dp[i] = fewest legs to cover nights [i, N); choice[i] = the leg to take at i.
+  const dp = new Array<number>(N + 1).fill(Number.POSITIVE_INFINITY)
+  const choice = new Array<{ row: Row; end: number } | null>(N + 1).fill(null)
+  dp[N] = 0
+  for (let i = N - 1; i >= 0; i--) {
     for (const r of rows) {
       if (!r.avail[i]) continue
-      let j = i
-      while (j < nights && r.avail[j]) j++
-      if (j - i < r.minNights) continue // this leg would be shorter than the villa's minimum stay
-      if (j > bestEnd) {
-        bestEnd = j
-        best = r
+      // Furthest contiguous night this villa can reach from i.
+      let run = 0
+      while (i + run < N && r.avail[i + run]) run++
+      const maxEnd = i + run
+      const minEnd = i + r.minNights
+      // Try longest leg first so ties prefer fewer, longer stays.
+      for (let e = Math.min(maxEnd, N); e >= minEnd; e--) {
+        if (dp[e] + 1 < dp[i]) {
+          dp[i] = dp[e] + 1
+          choice[i] = { row: r, end: e }
+        }
       }
     }
-    if (!best) {
-      return {
-        covered: false,
-        firstGapDate: nightDates[i],
-        note: 'No combination of villas can cover the full range without a gap.',
+  }
+
+  if (!Number.isFinite(dp[0])) {
+    // Explain why: a night with zero availability is a hard gap; otherwise the
+    // nights just can't be tiled into legs that each meet the minimum stay.
+    let gap: string | null = null
+    for (let i = 0; i < N; i++) {
+      if (!rows.some((r) => r.avail[i])) {
+        gap = nightDates[i]
+        break
       }
     }
+    return {
+      covered: false,
+      ...(gap ? { firstGapDate: gap } : {}),
+      note: gap
+        ? `No villa is available on the night of ${gap}, so the full range cannot be covered even by combining villas.`
+        : "The available nights cannot be combined into stays that each meet the villas' minimum-stay length.",
+    }
+  }
+
+  const segments: Seg[] = []
+  for (let i = 0; i < N; ) {
+    const step = choice[i]!
+    const { row: r, end: e } = step
     let total = 0
-    for (let k = i; k < bestEnd; k++) total += best.price[k]
-    const segNights = bestEnd - i
-    const mult = losDiscountMultiplier(segNights, best.info)
+    for (let k = i; k < e; k++) total += r.price[k]
+    const segNights = e - i
+    const mult = losDiscountMultiplier(segNights, r.info)
     segments.push({
-      slug: best.slug,
-      name: best.name,
+      slug: r.slug,
+      name: r.name,
       checkIn: nightDates[i],
-      checkOut: bestEnd < nights ? nightDates[bestEnd] : checkOut,
+      checkOut: e < N ? nightDates[e] : checkOut,
       nights: segNights,
       accommodationTotal: Math.round(total * mult),
     })
-    i = bestEnd
+    i = e
   }
 
   return {
@@ -201,7 +229,7 @@ WHAT YOU CAN TALK ABOUT (everything a guest should know)
 - Villa details: bedrooms, bathrooms, capacity, amenities, layout, location, the area, distances to beach/restaurants.
 - Public pricing: nightly "from" prices, cleaning fee, extra-guest fee, weekly/monthly discounts, minimum stay.
 - Availability and total price for specific dates. When the visitor asks about availability for dates WITHOUT naming a villa, call search_availability to list EVERY available villa for those dates. When they name a specific villa, use check_availability.
-- Split stays across villas: if NO single villa is available for the guest's full range, call find_split_stay to build an itinerary that covers the whole period by moving between villas (e.g. Bali Bliss for the first nights, then Bali Blue 1 for the rest). Present each leg on its own short line: villa, dates, nights and price, then the combined total. Frame it warmly as a way to still enjoy the full stay, not as a problem. Append one [BOOK:slug] line for EACH villa in the itinerary. Only suggest a split stay when a single villa cannot cover the whole range; if find_split_stay returns covered:false, tell them those exact dates can't be pieced together and offer WhatsApp.
+- Split stays across villas: if NO single villa is available for the guest's full range, you MUST call find_split_stay BEFORE telling them anything is unavailable. Never say a stay is impossible until find_split_stay has returned. It builds an itinerary covering the whole period by moving between villas (e.g. Bali Bliss for the first nights, then Bali Blue 1 for the rest). If it returns covered:true, present each leg on its own short line (villa, dates, nights, price), then the combined total, framed warmly as a way to still enjoy the full stay, and append one [BOOK:slug] line for EACH villa in the itinerary. Only if it returns covered:false do you say it can't be pieced together: use its note to explain briefly (a fully booked night, or minimum-stay lengths) and offer WhatsApp.
 - Check-in/check-out times, booking process (request to book, host confirms), payment is arranged after confirmation.
 - Prices are quoted in EUR; mention visitors can switch the display currency on the site.
 
@@ -409,10 +437,17 @@ export async function POST(req: NextRequest) {
           out = await searchAvailability(args.checkIn ?? '', args.checkOut ?? '', args.guests)
         } else if (call.function.name === 'find_split_stay') {
           out = await findSplitStay(args.checkIn ?? '', args.checkOut ?? '', args.guests)
-          const r = out as { covered?: boolean; segments?: { slug: string; checkIn: string; checkOut: string }[] }
+          const r = out as {
+            covered?: boolean
+            segments?: { slug: string; checkIn: string; checkOut: string }[]
+          }
           if (r.covered && r.segments) {
             for (const s of r.segments) legDates.set(s.slug, { checkIn: s.checkIn, checkOut: s.checkOut })
           }
+          console.log(
+            `split_stay ${args.checkIn}..${args.checkOut} g=${args.guests ?? '-'} -> ` +
+              (r.covered ? `covered ${r.segments?.map((s) => s.slug).join('+')}` : 'not covered'),
+          )
         } else {
           out = { error: 'Unknown function' }
         }
