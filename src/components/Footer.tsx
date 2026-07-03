@@ -1,19 +1,22 @@
+'use client'
+
 import Link from 'next/link'
+import { useLanguage } from './LanguageProvider'
 
 export default function Footer() {
+  const { t } = useLanguage()
   return (
     <footer id="contact" className="bg-villa-dark text-stone-300 py-16">
       <div className="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-10">
         <div>
           <h3 className="font-serif text-2xl text-white mb-3">YBG Villas</h3>
           <p className="text-sm leading-relaxed text-stone-400">
-            Five private pool villas in the heart of Bali. Book direct for the best rates
-            and personalised service.
+            {t('Five private pool villas in the heart of Bali. Book direct for the best rates and personalised service.')}
           </p>
         </div>
 
         <div>
-          <h4 className="font-serif text-lg text-white mb-3">Our Villas</h4>
+          <h4 className="font-serif text-lg text-white mb-3">{t('Our Villas')}</h4>
           <ul className="space-y-2 text-sm">
             {[
               { slug: 'bali-bliss', name: 'Bali Bliss' },
@@ -32,7 +35,7 @@ export default function Footer() {
         </div>
 
         <div>
-          <h4 className="font-serif text-lg text-white mb-3">Contact</h4>
+          <h4 className="font-serif text-lg text-white mb-3">{t('Contact')}</h4>
           <div className="space-y-3 text-sm">
             <a
               href="https://wa.me/6282221762980"
@@ -55,14 +58,14 @@ export default function Footer() {
               </svg>
               yourbaligetaway.bali@gmail.com
             </a>
-            <p className="text-stone-400">Seminyak, Bali, Indonesia</p>
+            <p className="text-stone-400">{t('Seminyak, Bali, Indonesia')}</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto px-6 mt-12 pt-6 border-t border-stone-700 text-xs text-stone-500 flex flex-col md:flex-row justify-between gap-2">
-        <p>© {new Date().getFullYear()} YBG Villas. All rights reserved.</p>
-        <p>Powered by Hostaway. Real-time availability, zero double bookings.</p>
+        <p>© {new Date().getFullYear()} YBG Villas. {t('All rights reserved.')}</p>
+        <p>{t('Powered by Hostaway. Real-time availability, zero double bookings.')}</p>
       </div>
     </footer>
   )

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCurrency } from './CurrencyProvider'
+import { useLanguage } from './LanguageProvider'
 
 interface VillaResult {
   slug: string
@@ -32,6 +33,7 @@ export default function VillaSearch() {
   const [results, setResults] = useState<VillaResult[] | null>(null)
   const [searched, setSearched] = useState(false)
   const { format } = useCurrency()
+  const { t } = useLanguage()
 
   const money = (n: number) => format(n)
 
@@ -39,11 +41,11 @@ export default function VillaSearch() {
     e.preventDefault()
     setError(null)
     if (!checkIn || !checkOut) {
-      setError('Please pick your check-in and check-out dates.')
+      setError(t('Please pick your check-in and check-out dates.'))
       return
     }
     if (checkOut <= checkIn) {
-      setError('Check-out must be after check-in.')
+      setError(t('Check-out must be after check-in.'))
       return
     }
     setLoading(true)
@@ -68,7 +70,7 @@ export default function VillaSearch() {
       {/* Search form */}
       <form onSubmit={search} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
         <label className="block">
-          <span className="block text-sm text-villa-muted mb-1.5">Check-in</span>
+          <span className="block text-sm text-villa-muted mb-1.5">{t('Check-in')}</span>
           <input
             type="date"
             min={todayISO()}
@@ -78,7 +80,7 @@ export default function VillaSearch() {
           />
         </label>
         <label className="block">
-          <span className="block text-sm text-villa-muted mb-1.5">Check-out</span>
+          <span className="block text-sm text-villa-muted mb-1.5">{t('Check-out')}</span>
           <input
             type="date"
             min={checkIn || todayISO(1)}
@@ -88,11 +90,11 @@ export default function VillaSearch() {
           />
         </label>
         <label className="block">
-          <span className="block text-sm text-villa-muted mb-1.5">Guests</span>
+          <span className="block text-sm text-villa-muted mb-1.5">{t('Guests')}</span>
           <select value={guests} onChange={(e) => setGuests(Number(e.target.value))} className="input">
             {Array.from({ length: 8 }, (_, i) => i + 1).map((n) => (
               <option key={n} value={n}>
-                {n} {n === 1 ? 'guest' : 'guests'}
+                {n} {n === 1 ? t('guest') : t('guests')}
               </option>
             ))}
           </select>
@@ -102,7 +104,7 @@ export default function VillaSearch() {
           disabled={loading}
           className="bg-villa-green text-white font-medium py-3 rounded-xl hover:bg-villa-green-light transition-colors disabled:opacity-60"
         >
-          {loading ? 'Searching…' : 'Search'}
+          {loading ? t('Searching…') : t('Search')}
         </button>
       </form>
 
@@ -113,12 +115,12 @@ export default function VillaSearch() {
         <div className="mt-8">
           {available.length === 0 ? (
             <p className="text-center text-villa-muted py-6">
-              No villas available for those dates. Try different dates or fewer guests.
+              {t('No villas available for those dates. Try different dates or fewer guests.')}
             </p>
           ) : (
             <>
               <p className="text-sm text-villa-muted mb-4">
-                {available.length} {available.length === 1 ? 'villa' : 'villas'} available
+                {available.length} {available.length === 1 ? t('villa') : t('villas')} {t('available')}
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {available.map((v) => (
@@ -143,11 +145,11 @@ export default function VillaSearch() {
                           {money(v.total)}
                           {v.discountPct > 0 && (
                             <span className="ml-2 text-xs font-medium text-villa-green">
-                              {v.discountPct}% off
+                              {v.discountPct}% {t('off')}
                             </span>
                           )}
                         </span>
-                        <span className="text-villa-green text-sm group-hover:underline">View &amp; book →</span>
+                        <span className="text-villa-green text-sm group-hover:underline">{t('View & book')} →</span>
                       </div>
                     </div>
                   </Link>

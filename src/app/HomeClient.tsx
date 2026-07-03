@@ -9,11 +9,13 @@ import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import CinemaScrollHero from '@/components/blocks/cinema-scroll-hero'
 import { useCurrency } from '@/components/CurrencyProvider'
+import { useLanguage } from '@/components/LanguageProvider'
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
 import type { VillaCard } from './HomeWrapper'
 
 export default function HomeClient({ villas }: { villas: VillaCard[] }) {
   const { format } = useCurrency()
+  const { t } = useLanguage()
   const rootRef = useRef<HTMLDivElement>(null)
 
   useGSAP(
@@ -89,8 +91,8 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
         frameCount={244}
         scrollLengthVh={340}
         title="Your Bali Getaway"
-        kicker="Bali, Indonesia"
-        scrollHint="Scroll to explore"
+        kicker={t('Bali, Indonesia')}
+        scrollHint={t('Scroll to explore')}
       />
 
 
@@ -98,9 +100,9 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
       <section id="villas" data-nav-light-bg className="py-24 px-6">
         <div className="max-w-6xl mx-auto">
           <div className="reveal-heading text-center mb-16">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">The Collection</p>
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('The Collection')}</p>
             <h2 className="font-serif text-4xl md:text-5xl text-villa-dark font-light">
-              Five Exceptional Villas
+              {t('Five Exceptional Villas')}
             </h2>
             <div className="gold-rule mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
           </div>
@@ -141,13 +143,13 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
                   <div className="flex items-center gap-4 text-sm text-villa-muted mb-4">
                     <span className="flex items-center gap-1"><BedIcon /> {villa.bedrooms} BR</span>
                     <span className="flex items-center gap-1"><BathIcon /> {villa.bathrooms} BA</span>
-                    <span className="flex items-center gap-1"><GuestIcon /> {villa.guests} guests</span>
+                    <span className="flex items-center gap-1"><GuestIcon /> {villa.guests} {t('guests')}</span>
                   </div>
                   {villa.fromPrice != null && (
                     <p className="text-villa-dark mb-4">
-                      <span className="text-xs text-villa-muted">From </span>
+                      <span className="text-xs text-villa-muted">{t('From')} </span>
                       <span className="font-medium">{format(villa.fromPrice)}</span>
-                      <span className="text-xs text-villa-muted"> / night</span>
+                      <span className="text-xs text-villa-muted"> {t('/ night')}</span>
                     </p>
                   )}
                   <div className="mt-auto flex items-center gap-3 pt-1">
@@ -155,13 +157,13 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
                       href={`/villas/${villa.slug}#book`}
                       className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-full bg-villa-green px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light"
                     >
-                      Check availability
+                      {t('Check availability')}
                     </Link>
                     <Link
                       href={`/villas/${villa.slug}`}
                       className="group/view text-villa-green text-sm font-medium inline-flex items-center gap-1 whitespace-nowrap"
                     >
-                      View villa
+                      {t('View villa')}
                       <span className="inline-block transition-transform duration-300 group-hover/view:translate-x-1" aria-hidden="true">→</span>
                     </Link>
                   </div>
@@ -183,8 +185,8 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
           ].map((item) => (
             <div key={item.title} className="rise-item text-white">
               <div className="text-villa-gold text-2xl mb-4">{item.icon}</div>
-              <h3 className="font-serif text-xl mb-2">{item.title}</h3>
-              <p className="text-stone-300 text-sm leading-relaxed">{item.body}</p>
+              <h3 className="font-serif text-xl mb-2">{t(item.title)}</h3>
+              <p className="text-stone-300 text-sm leading-relaxed">{t(item.body)}</p>
             </div>
           ))}
         </div>
@@ -194,10 +196,10 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
       <section id="book" data-nav-light-bg className="py-24 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="reveal-heading text-center mb-12">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
-            <h2 className="font-serif text-4xl md:text-5xl text-villa-dark font-light mb-4">Check Availability</h2>
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('Direct Booking')}</p>
+            <h2 className="font-serif text-4xl md:text-5xl text-villa-dark font-light mb-4">{t('Check Availability')}</h2>
             <p className="text-villa-muted max-w-lg mx-auto">
-              Select your dates and villa below. Real-time calendar — no double bookings, ever.
+              {t('Select your dates and villa below. Real-time calendar. No double bookings, ever.')}
             </p>
           </div>
           <div className="rise-item relative bg-white rounded-2xl shadow-[0_18px_50px_-20px_rgba(26,26,26,0.18)] ring-1 ring-stone-100 p-6 md:p-8">
@@ -210,9 +212,9 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
       <section data-nav-light-bg className="py-24 px-6 bg-villa-cream">
         <div className="max-w-5xl mx-auto">
           <div className="reveal-heading text-center mb-16">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Guest Experiences</p>
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('Guest Experiences')}</p>
             <h2 className="font-serif text-4xl md:text-5xl text-villa-dark font-light">
-              What Our Guests Say
+              {t('What Our Guests Say')}
             </h2>
             <div className="gold-rule mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
           </div>

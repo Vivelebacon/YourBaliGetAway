@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useCurrency } from './CurrencyProvider'
+import { useLanguage } from './LanguageProvider'
 
 // ── Date helpers (local, no timezone surprises) ──
 function ymd(d: Date) {
@@ -51,6 +52,8 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
   }, [])
 
   const { format } = useCurrency()
+  const { t, locale } = useLanguage()
+  const localeTag = locale === 'en' ? 'en-US' : locale
   const [days, setDays] = useState<Map<string, DayInfo>>(new Map())
   // Length-of-stay discount multipliers from Hostaway (1 = no discount).
   const [discount, setDiscount] = useState({ weekly: 1, monthly: 1 })
@@ -168,14 +171,14 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
     }
     // Tentative checkout
     if (!rangeAvailable(checkIn, date)) {
-      setRangeError('Those dates include unavailable nights. Pick a different range.')
+      setRangeError(t('Those dates include unavailable nights. Pick a different range.'))
       setCheckIn(date)
       setCheckOut(null)
       return
     }
     const minStay = days.get(ymd(checkIn))?.minStay ?? 1
     if (nights(checkIn, date) < minStay) {
-      setRangeError(`Minimum stay for these dates is ${minStay} nights.`)
+      setRangeError(t('Minimum stay for these dates is {n} nights.').replace('{n}', String(minStay)))
       return
     }
     setCheckOut(date)
@@ -233,7 +236,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
     return (
       <div className="flex-1 min-w-[260px]">
         <p className="text-center font-serif text-lg text-villa-dark mb-3">
-          {monthDate.toLocaleString('en-US', { month: 'long', year: 'numeric' })}
+          {monthDate.toLocaleString(localeTag, { month: 'long', year: 'numeric' })}
         </p>
         <div className="grid grid-cols-7 gap-1 text-center text-xs text-villa-muted mb-1">
           {WEEKDAYS.map((w) => (
@@ -274,15 +277,15 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
   if (loading) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-10 text-center text-villa-muted">
-        Loading live availability…
+        {t('Loading live availability…')}
       </div>
     )
   }
   if (loadError) {
     return (
       <div className="bg-white rounded-2xl shadow-sm p-10 text-center">
-        <p className="text-villa-dark mb-2">We couldn&apos;t load availability right now.</p>
-        <p className="text-villa-muted text-sm">Please refresh, or contact us directly via WhatsApp.</p>
+        <p className="text-villa-dark mb-2">{t("We couldn't load availability right now.")}</p>
+        <p className="text-villa-muted text-sm">{t('Please refresh, or contact us directly via WhatsApp.')}</p>
       </div>
     )
   }
@@ -290,12 +293,12 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
     return (
       <div className="bg-white rounded-2xl shadow-sm p-10 text-center max-w-xl mx-auto">
         <div className="text-villa-gold text-3xl mb-4">✦</div>
-        <h3 className="font-serif text-2xl text-villa-dark mb-3">Request sent</h3>
+        <h3 className="font-serif text-2xl text-villa-dark mb-3">{t('Request sent')}</h3>
         <p className="text-villa-muted leading-relaxed">
-          Thank you. Your request for <span className="text-villa-dark">{villaName}</span> from{' '}
-          <span className="text-villa-dark">{checkIn && ymd(checkIn)}</span> to{' '}
-          <span className="text-villa-dark">{checkOut && ymd(checkOut)}</span> has been received. Your
-          host will review and confirm with you shortly. These dates are not blocked until confirmed.
+          {t('Thank you. Your request for {villa} from {from} to {to} has been received. Your host will review and confirm with you shortly. These dates are not blocked until confirmed.')
+            .replace('{villa}', villaName)
+            .replace('{from}', checkIn ? ymd(checkIn) : '')
+            .replace('{to}', checkOut ? ymd(checkOut) : '')}
         </p>
       </div>
     )
@@ -312,16 +315,16 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
           onClick={() => setViewMonth(addMonths(viewMonth, -1))}
           disabled={ymd(viewMonth) <= ymd(startOfMonth(today))}
           className="px-3 py-1.5 rounded-lg text-villa-green hover:bg-villa-green/10 disabled:opacity-30 disabled:cursor-not-allowed"
-          aria-label="Previous month"
+          aria-label={t('Previous month')}
         >
           ←
         </button>
-        <span className="text-sm text-villa-muted">Select your dates</span>
+        <span className="text-sm text-villa-muted">{t('Select your dates')}</span>
         <button
           type="button"
           onClick={() => setViewMonth(addMonths(viewMonth, 1))}
           className="px-3 py-1.5 rounded-lg text-villa-green hover:bg-villa-green/10"
-          aria-label="Next month"
+          aria-label={t('Next month')}
         >
           →
         </button>
@@ -344,19 +347,19 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
                 {ymd(checkIn!)} → {ymd(checkOut!)}
               </p>
               <p className="text-villa-muted text-sm">
-                {nightsCount} {nightsCount === 1 ? 'night' : 'nights'} ·{' '}
+                {nightsCount} {nightsCount === 1 ? t('night') : t('nights')} ·{' '}
                 {discountPct > 0 ? (
                   <>
                     <span className="line-through opacity-60">{money(totalPrice)}</span>{' '}
-                    <span className="text-villa-dark font-medium">{money(discountedTotal)}</span> total
+                    <span className="text-villa-dark font-medium">{money(discountedTotal)}</span> {t('total')}
                   </>
                 ) : (
-                  <>{money(totalPrice)} total</>
+                  <>{money(totalPrice)} {t('total')}</>
                 )}
               </p>
               {discountPct > 0 && (
                 <p className="text-villa-green text-xs mt-1">
-                  {discountPct}% {nightsCount >= 28 ? 'monthly' : 'weekly'} discount applied
+                  {discountPct}% {nightsCount >= 28 ? t('monthly discount applied') : t('weekly discount applied')}
                 </p>
               )}
             </div>
@@ -369,12 +372,12 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
               }}
               className="text-sm text-villa-muted hover:text-villa-green underline"
             >
-              Clear dates
+              {t('Clear dates')}
             </button>
           </div>
 
           <form onSubmit={submit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Field label="Full name">
+            <Field label={t('Full name')}>
               <input
                 required
                 value={form.name}
@@ -382,7 +385,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
                 className="input"
               />
             </Field>
-            <Field label="Email">
+            <Field label={t('Email')}>
               <input
                 required
                 type="email"
@@ -391,7 +394,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
                 className="input"
               />
             </Field>
-            <Field label="Guests">
+            <Field label={t('Guests')}>
               <select
                 value={form.guests}
                 onChange={(e) => setForm({ ...form, guests: Number(e.target.value) })}
@@ -399,12 +402,12 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
               >
                 {Array.from({ length: maxGuests }, (_, i) => i + 1).map((n) => (
                   <option key={n} value={n}>
-                    {n} {n === 1 ? 'guest' : 'guests'}
+                    {n} {n === 1 ? t('guest') : t('guests')}
                   </option>
                 ))}
               </select>
             </Field>
-            <Field label="Phone (optional)">
+            <Field label={t('Phone (optional)')}>
               <input
                 value={form.phone}
                 onChange={(e) => setForm({ ...form, phone: e.target.value })}
@@ -412,7 +415,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
               />
             </Field>
             <div className="md:col-span-2">
-              <Field label="Message (optional)">
+              <Field label={t('Message (optional)')}>
                 <textarea
                   rows={3}
                   value={form.message}
@@ -430,10 +433,10 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
                 disabled={submitting}
                 className="w-full bg-villa-green text-white font-medium py-3.5 rounded-xl hover:bg-villa-green-light transition-colors disabled:opacity-60"
               >
-                {submitting ? 'Sending…' : 'Request to Book'}
+                {submitting ? t('Sending…') : t('Request to Book')}
               </button>
               <p className="text-center text-xs text-villa-muted mt-3">
-                No instant booking. Your host confirms before any dates are blocked.
+                {t('No instant booking. Your host confirms before any dates are blocked.')}
               </p>
             </div>
           </form>

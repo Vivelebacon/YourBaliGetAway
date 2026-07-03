@@ -5,12 +5,15 @@ import Image from 'next/image'
 import { useState, useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 import CurrencySwitcher from './CurrencySwitcher'
+import LanguageSwitcher from './LanguageSwitcher'
+import { useLanguage } from './LanguageProvider'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [darkText, setDarkText] = useState(false)
   const pathname = usePathname()
   const isLanding = pathname === '/'
+  const { t } = useLanguage()
 
   // Header positioning:
   //  - Non-landing pages: non-sticky. It sits over the top hero (absolute) and simply
@@ -112,17 +115,18 @@ export default function Navbar() {
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-8">
           <Link href="/" onClick={goHome} className={linkClass}>
-            Home
+            {t('Home')}
           </Link>
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={linkClass}>
-            Our Villas
+            {t('Our Villas')}
           </Link>
           <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={linkClass}>
-            Book
+            {t('Book')}
           </Link>
           <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className={linkClass}>
-            Contact
+            {t('Contact')}
           </Link>
+          <LanguageSwitcher light={!darkText} />
           <CurrencySwitcher light={!darkText} />
           <a
             href="https://wa.me/6282221762980"
@@ -130,7 +134,7 @@ export default function Navbar() {
             rel="noopener noreferrer"
             className="bg-villa-green text-white text-sm px-5 py-2 rounded-full hover:bg-villa-green-light transition-colors"
           >
-            WhatsApp Us
+            {t('WhatsApp Us')}
           </a>
         </div>
 
@@ -147,12 +151,16 @@ export default function Navbar() {
       {/* Mobile menu */}
       {open && (
         <div className="md:hidden bg-white/95 backdrop-blur-sm border-t border-stone-200 px-6 py-4 flex flex-col gap-4">
-          <Link href="/" onClick={goHome} className="text-villa-dark hover:text-villa-green">Home</Link>
-          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className="text-villa-dark hover:text-villa-green">Our Villas</Link>
-          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className="text-villa-dark hover:text-villa-green">Book</Link>
-          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className="text-villa-dark hover:text-villa-green">Contact</Link>
+          <Link href="/" onClick={goHome} className="text-villa-dark hover:text-villa-green">{t('Home')}</Link>
+          <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className="text-villa-dark hover:text-villa-green">{t('Our Villas')}</Link>
+          <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className="text-villa-dark hover:text-villa-green">{t('Book')}</Link>
+          <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className="text-villa-dark hover:text-villa-green">{t('Contact')}</Link>
           <div className="flex items-center gap-2">
-            <span className="text-sm text-villa-muted">Currency</span>
+            <span className="text-sm text-villa-muted">{t('Language')}</span>
+            <LanguageSwitcher />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-villa-muted">{t('Currency')}</span>
             <CurrencySwitcher />
           </div>
           <a
@@ -161,7 +169,7 @@ export default function Navbar() {
             rel="noopener noreferrer"
             className="bg-villa-green text-white text-center px-5 py-2 rounded-full"
           >
-            WhatsApp Us
+            {t('WhatsApp Us')}
           </a>
         </div>
       )}

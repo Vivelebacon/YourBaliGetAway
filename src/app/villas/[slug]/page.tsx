@@ -8,10 +8,8 @@ import BookingCalendar from '@/components/BookingCalendar'
 import Gallery from '@/components/Gallery'
 import { getHostawayListingId } from '@/lib/villas'
 import { getVillaBySlug, getVillaSlugs, getVillasList } from '@/lib/content'
-
-// Revalidate from Supabase periodically; admin edits also trigger on-demand
-// revalidation, so changes appear within seconds.
-export const revalidate = 60
+import { getLocale } from '@/lib/locale'
+import { getMessages } from '@/lib/translate'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -34,11 +32,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function VillaPage({ params }: Props) {
   const { slug } = await params
-  const villa = await getVillaBySlug(slug)
+  const locale = await getLocale()
+  const villa = await getVillaBySlug(slug, locale)
   if (!villa) notFound()
 
+  const messages = await getMessages(locale)
+  const t = (s: string) => messages[s] ?? s
+
   const listingId = getHostawayListingId(slug)
-  const others = (await getVillasList()).filter((v) => v.slug !== slug).slice(0, 3)
+  const others = (await getVillasList(locale)).filter((v) => v.slug !== slug).slice(0, 3)
 
   const descIsHtml = /<[a-z][\s\S]*>/i.test(villa.description)
   const descParagraphs = villa.description.split('\n\n').filter(Boolean)
@@ -59,7 +61,7 @@ export default async function VillaPage({ params }: Props) {
             <span className="text-villa-gold">★</span>
             <span>{villa.rating}</span>
             <span className="text-white/40">·</span>
-            <span>{villa.reviewCount} reviews</span>
+            <span>{villa.reviewCount} {t('reviews')}</span>
           </div>
           <div className="flex flex-wrap justify-center gap-2 mt-5">
             {villa.highlights.map((h) => (
@@ -77,9 +79,9 @@ export default async function VillaPage({ params }: Props) {
               <p className="text-villa-green text-lg font-light italic mb-6">{villa.subtitle}</p>
             )}
             <div className="flex gap-8 mb-8">
-              <Stat label="Bedrooms" value={String(villa.bedrooms)} />
-              <Stat label="Bathrooms" value={String(villa.bathrooms)} />
-              <Stat label="Guests" value={`Up to ${villa.guests}`} />
+              <Stat label={t('Bedrooms')} value={String(villa.bedrooms)} />
+              <Stat label={t('Bathrooms')} value={String(villa.bathrooms)} />
+              <Stat label={t('Guests')} value={t('Up to {n}').replace('{n}', String(villa.guests))} />
             </div>
             {descIsHtml ? (
               <div
@@ -97,7 +99,7 @@ export default async function VillaPage({ params }: Props) {
 
           {/* Amenities */}
           <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <h3 className="font-serif text-2xl text-villa-dark mb-5">Amenities</h3>
+            <h3 className="font-serif text-2xl text-villa-dark mb-5">{t('Amenities')}</h3>
             <ul className="grid grid-cols-1 gap-3">
               {villa.amenities.map((a) => (
                 <li key={a} className="flex items-center gap-3 text-sm text-stone-600">
@@ -114,9 +116,9 @@ export default async function VillaPage({ params }: Props) {
       <section id="book" data-nav-light-bg className="py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">Direct Booking</p>
-            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">Reserve {villa.name}</h2>
-            <p className="text-stone-500 text-sm">Real-time availability. Send a request and your host confirms. Best rate guaranteed.</p>
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('Direct Booking')}</p>
+            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">{t('Reserve {villa}').replace('{villa}', villa.name)}</h2>
+            <p className="text-stone-500 text-sm">{t('Real-time availability. Send a request and your host confirms. Best rate guaranteed.')}</p>
           </div>
           {listingId && (
             <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
@@ -127,7 +129,7 @@ export default async function VillaPage({ params }: Props) {
       {/* ── Gallery ── */}
       <section data-nav-light-bg className="px-6 pb-16">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-3xl text-villa-dark mb-8">Gallery</h2>
+          <h2 className="font-serif text-3xl text-villa-dark mb-8">{t('Gallery')}</h2>
           <Gallery images={villa.images} />
         </div>
       </section>
@@ -136,9 +138,9 @@ export default async function VillaPage({ params }: Props) {
       <section data-nav-light-bg className="bg-white py-20 px-6">
         <div className="max-w-5xl mx-auto">
           <div className="flex items-baseline gap-4 mb-10">
-            <h2 className="font-serif text-3xl text-villa-dark">Guest Reviews</h2>
+            <h2 className="font-serif text-3xl text-villa-dark">{t('Guest Reviews')}</h2>
             <span className="text-villa-gold text-lg">★ {villa.rating}</span>
-            <span className="text-stone-400 text-sm">({villa.reviewCount} reviews on Airbnb)</span>
+            <span className="text-stone-400 text-sm">{t('({n} reviews on Airbnb)').replace('{n}', String(villa.reviewCount))}</span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {villa.reviews.map((r) => (
@@ -164,7 +166,7 @@ export default async function VillaPage({ params }: Props) {
       {/* ── Other Villas ── */}
       <section data-nav-light-bg className="bg-white py-20 px-6">
         <div className="max-w-6xl mx-auto">
-          <h2 className="font-serif text-3xl text-villa-dark mb-10">You Might Also Like</h2>
+          <h2 className="font-serif text-3xl text-villa-dark mb-10">{t('You Might Also Like')}</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {others.map((v) => (
               <Link key={v.slug} href={`/villas/${v.slug}`} className="group bg-villa-cream rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
@@ -177,7 +179,7 @@ export default async function VillaPage({ params }: Props) {
                     <span className="text-villa-gold text-sm">★ {v.rating}</span>
                   </div>
                   <p className="text-villa-muted text-sm">{v.subtitle}</p>
-                  <span className="text-villa-green text-sm mt-3 inline-block group-hover:underline">View Villa →</span>
+                  <span className="text-villa-green text-sm mt-3 inline-block group-hover:underline">{t('View Villa')} →</span>
                 </div>
               </Link>
             ))}
@@ -186,7 +188,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       <div className="text-center py-8">
-        <Link href="/" className="text-villa-muted text-sm hover:text-villa-green transition-colors">← Back to all villas</Link>
+        <Link href="/" className="text-villa-muted text-sm hover:text-villa-green transition-colors">← {t('Back to all villas')}</Link>
       </div>
 
       <Footer />

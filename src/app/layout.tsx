@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
+import { LanguageProvider } from '@/components/LanguageProvider'
 import ChatWidget from '@/components/ChatWidget'
+import { getLocale } from '@/lib/locale'
+import { getMessages } from '@/lib/translate'
 
 export const metadata: Metadata = {
   title: 'Luxury Private Pool Villas in Bali | Your Bali Getaway',
@@ -15,12 +18,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale()
+  const messages = await getMessages(locale)
   return (
-    <html lang="en">
+    <html lang={locale}>
       <body suppressHydrationWarning>
-        <CurrencyProvider>{children}</CurrencyProvider>
-        <ChatWidget />
+        <LanguageProvider locale={locale} messages={messages}>
+          <CurrencyProvider>{children}</CurrencyProvider>
+          <ChatWidget />
+        </LanguageProvider>
       </body>
     </html>
   )

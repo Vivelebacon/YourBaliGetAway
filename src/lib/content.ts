@@ -3,6 +3,7 @@
 // Uses the anon key (public read is allowed by RLS). Safe on server.
 // ──────────────────────────────────────────────────────────────
 import { createClient } from '@supabase/supabase-js'
+import { translateTexts } from '@/lib/translate'
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
@@ -74,13 +75,55 @@ function toListItem(r: VillaRow): VillaListItem {
   }
 }
 
-export async function getVillasList(): Promise<VillaListItem[]> {
+// ── Localization: translate the guest-facing CMS text into `locale`.
+// Villa/brand names are intentionally left untranslated. English is a no-op.
+async function localizeList(items: VillaListItem[], locale: string): Promise<VillaListItem[]> {
+  if (locale === 'en' || items.length === 0) return items
+  const src: string[] = []
+  for (const v of items) {
+    src.push(v.subtitle)
+    for (const h of v.highlights) src.push(h)
+  }
+  const tr = await translateTexts(src, locale)
+  let k = 0
+  return items.map((v) => {
+    const subtitle = tr[k++] ?? v.subtitle
+    const highlights = v.highlights.map(() => tr[k++] ?? '')
+    return { ...v, subtitle, highlights }
+  })
+}
+
+async function localizeDetail(v: VillaDetail, locale: string): Promise<VillaDetail> {
+  if (locale === 'en') return v
+  const src: string[] = [
+    v.subtitle,
+    v.description,
+    ...v.highlights,
+    ...v.amenities,
+    ...v.reviews.map((r) => r.text),
+    ...v.images.map((i) => i.caption ?? ''),
+  ]
+  const tr = await translateTexts(src, locale)
+  let k = 0
+  const subtitle = tr[k++] ?? v.subtitle
+  const description = tr[k++] ?? v.description
+  const highlights = v.highlights.map(() => tr[k++] ?? '')
+  const amenities = v.amenities.map(() => tr[k++] ?? '')
+  const reviews = v.reviews.map((r) => ({ ...r, text: tr[k++] ?? r.text }))
+  const images = v.images.map((i) => {
+    const t = tr[k++]
+    return { ...i, caption: i.caption ? t ?? i.caption : i.caption }
+  })
+  return { ...v, subtitle, description, highlights, amenities, reviews, images }
+}
+
+export async function getVillasList(locale = 'en'): Promise<VillaListItem[]> {
   const { data, error } = await supabase
     .from('villas')
     .select('slug,name,subtitle,cover_image,highlights,bedrooms,bathrooms,guests,rating,preview_highlights_count')
     .order('sort_order', { ascending: true })
   if (error || !data) return []
-  return (data as VillaRow[]).map(toListItem)
+  return localizeList((data as VillaRow[]).map(toListItem), locale)
 }
 
 export async function getVillaSlugs(): Promise<string[]> {
@@ -88,7 +131,7 @@ export async function getVillaSlugs(): Promise<string[]> {
   return (data ?? []).map((v) => (v as { slug: string }).slug)
 }
 
-export async function getVillaBySlug(slug: string): Promise<VillaDetail | null> {
+export async function getVillaBySlug(slug: string, locale = 'en'): Promise<VillaDetail | null> {
   const { data, error } = await supabase
     .from('villas')
     .select(
@@ -116,7 +159,7 @@ export async function getVillaBySlug(slug: string): Promise<VillaDetail | null> 
     .sort((a, b) => a.sort_order - b.sort_order)
     .map((r) => ({ name: r.name, text: r.text }))
 
-  return {
+  const detail: VillaDetail = {
     ...toListItem(row),
     description: row.description ?? '',
     amenities: row.amenities ?? [],
@@ -124,4 +167,5 @@ export async function getVillaBySlug(slug: string): Promise<VillaDetail | null> 
     reviews,
     images,
   }
+  return localizeDetail(detail, locale)
 }

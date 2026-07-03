@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
+import { useLanguage } from './LanguageProvider'
 
 interface VillaCard {
   slug: string
@@ -19,11 +20,8 @@ interface ChatMsg {
 
 const WHATSAPP = 'https://wa.me/6282221762980'
 
-const GREETING: ChatMsg = {
-  role: 'assistant',
-  content:
-    "Hi there! I'm Maya from Your Bali Getaway 🌴 I'd love to help you find your perfect villa. Tell me your dates and how many of you are coming, and I'll show you what's available 😊",
-}
+const GREETING_TEXT =
+  "Hi there! I'm Maya from Your Bali Getaway 🌴 I'd love to help you find your perfect villa. Tell me your dates and how many of you are coming, and I'll show you what's available 😊"
 
 const QUICK_REPLIES = [
   'Check availability for my dates',
@@ -33,8 +31,11 @@ const QUICK_REPLIES = [
 ]
 
 export default function ChatWidget() {
+  const { t } = useLanguage()
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState<ChatMsg[]>([GREETING])
+  const [messages, setMessages] = useState<ChatMsg[]>(() => [
+    { role: 'assistant', content: t(GREETING_TEXT) },
+  ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -73,8 +74,7 @@ export default function ChatWidget() {
         ...m,
         {
           role: 'assistant',
-          content:
-            "Sorry, I couldn't respond just now. You can reach the team directly on WhatsApp.",
+          content: t("Sorry, I couldn't respond just now. You can reach the team directly on WhatsApp."),
           showWhatsApp: true,
         },
       ])
@@ -109,7 +109,7 @@ export default function ChatWidget() {
                 d="M4.848 2.771A49.144 49.144 0 0 1 12 2.25c2.43 0 4.817.178 7.152.52 1.978.292 3.348 2.024 3.348 3.97v6.02c0 1.946-1.37 3.678-3.348 3.97a48.9 48.9 0 0 1-3.476.383.39.39 0 0 0-.297.17l-2.755 4.133a.75.75 0 0 1-1.248 0l-2.755-4.133a.39.39 0 0 0-.297-.17 48.9 48.9 0 0 1-3.476-.384c-1.978-.29-3.348-2.024-3.348-3.97V6.741c0-1.946 1.37-3.68 3.348-3.97Z"
               />
             </svg>
-            <span className="text-sm font-medium whitespace-nowrap">Need help choosing your villa?</span>
+            <span className="text-sm font-medium whitespace-nowrap">{t('Need help choosing your villa?')}</span>
           </>
         )}
       </button>
@@ -120,7 +120,7 @@ export default function ChatWidget() {
           {/* Header */}
           <div className="bg-villa-green text-white px-5 py-4">
             <p className="font-serif text-lg leading-tight">Your Bali Getaway</p>
-            <p className="text-white/70 text-xs">Maya · usually replies instantly</p>
+            <p className="text-white/70 text-xs">{t('Maya · usually replies instantly')}</p>
           </div>
 
           {/* Messages */}
@@ -147,7 +147,7 @@ export default function ChatWidget() {
                           <img src={c.coverUrl} alt={c.name} className="w-full h-28 object-cover" />
                           <div className="px-3 py-2 flex items-center justify-between">
                             <span className="font-medium text-villa-dark text-sm">{c.name}</span>
-                            <span className="text-villa-green text-sm font-medium">Book now →</span>
+                            <span className="text-villa-green text-sm font-medium">{t('Book now')} →</span>
                           </div>
                         </a>
                       ))}
@@ -158,7 +158,7 @@ export default function ChatWidget() {
                           rel="noopener noreferrer"
                           className="block text-center border border-villa-green text-villa-green text-sm font-medium py-2 rounded-lg hover:bg-villa-green/5 transition-colors"
                         >
-                          Chat on WhatsApp
+                          {t('Chat on WhatsApp')}
                         </a>
                       )}
                     </div>
@@ -185,10 +185,10 @@ export default function ChatWidget() {
                 {QUICK_REPLIES.map((q) => (
                   <button
                     key={q}
-                    onClick={() => send(q)}
+                    onClick={() => send(t(q))}
                     className="text-xs text-villa-green border border-villa-green/40 rounded-full px-3 py-1.5 hover:bg-villa-green/5"
                   >
-                    {q}
+                    {t(q)}
                   </button>
                 ))}
               </div>
@@ -206,7 +206,7 @@ export default function ChatWidget() {
             <input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about the villas…"
+              placeholder={t('Ask about the villas…')}
               maxLength={2000}
               className="flex-1 text-sm px-3 py-2 rounded-full border border-stone-300 outline-none focus:border-villa-green"
             />

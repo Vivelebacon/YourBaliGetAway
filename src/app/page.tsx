@@ -2,11 +2,11 @@ import HomeWrapper from './HomeWrapper'
 import { getVillasList } from '@/lib/content'
 import { getHostawayListingId } from '@/lib/villas'
 import { getMinNightlyPrice } from '@/lib/hostaway'
-
-export const revalidate = 60
+import { getLocale } from '@/lib/locale'
 
 export default async function Page() {
-  const villas = await getVillasList()
+  const locale = await getLocale()
+  const villas = await getVillasList(locale)
   // Attach each villa's lowest available nightly price (EUR) for "from X/night".
   const withPrices = await Promise.all(
     villas.map(async (v) => {

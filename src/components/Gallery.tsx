@@ -3,12 +3,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import Image from 'next/image'
 import type { GalleryImage } from '@/lib/content'
+import { useLanguage } from './LanguageProvider'
 
 interface GalleryProps {
   images: GalleryImage[]
 }
 
 export default function Gallery({ images }: GalleryProps) {
+  const { t } = useLanguage()
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null)
 
   const open = (i: number) => setLightboxIndex(i)
@@ -87,7 +89,7 @@ export default function Gallery({ images }: GalleryProps) {
           <button
             onClick={close}
             className="absolute top-4 right-4 text-white/70 hover:text-white transition-colors p-2"
-            aria-label="Close"
+            aria-label={t('Close')}
           >
             <svg className="w-7 h-7" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -98,7 +100,7 @@ export default function Gallery({ images }: GalleryProps) {
           <button
             onClick={(e) => { e.stopPropagation(); prev() }}
             className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full"
-            aria-label="Previous"
+            aria-label={t('Previous')}
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -135,7 +137,7 @@ export default function Gallery({ images }: GalleryProps) {
           <button
             onClick={(e) => { e.stopPropagation(); next() }}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-white/70 hover:text-white transition-colors p-3 hover:bg-white/10 rounded-full"
-            aria-label="Next"
+            aria-label={t('Next')}
           >
             <svg className="w-8 h-8" fill="none" stroke="currentColor" strokeWidth={1.5} viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
