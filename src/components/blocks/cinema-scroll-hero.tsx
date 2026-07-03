@@ -238,6 +238,7 @@ export default function CinemaScrollHero({
 
   return (
     <section
+      id="hero"
       ref={sectionRef}
       className="relative w-full bg-villa-dark"
       style={{ height: reduced ? '100vh' : `${scrollLengthVh}vh` }}

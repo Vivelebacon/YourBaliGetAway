@@ -10,28 +10,61 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [darkText, setDarkText] = useState(false)
   const pathname = usePathname()
+  const isLanding = pathname === '/'
 
-  // The header is transparent at all times (never a solid bar). Over light-background
-  // sections (tagged data-nav-light-bg) the text flips to dark so it stays readable;
-  // over the hero and dark sections it keeps white text on a soft top scrim.
+  // Header positioning:
+  //  - Non-landing pages: non-sticky. It sits over the top hero (absolute) and simply
+  //    scrolls out of view with the page.
+  //  - Landing page: it STAYS pinned (fixed) over the whole hero scroll animation, then
+  //    once the hero is finished it releases and scrolls away — never seen again.
+  const [navFixed, setNavFixed] = useState(false)
+  const [navTop, setNavTop] = useState(0)
+
+  // Adaptive text colour + landing sticky-until-hero-ends behaviour, driven by scroll.
   useEffect(() => {
     const sample = 60 // px below the top of the viewport
+    // End of the pinned hero = its bottom reaching the viewport bottom.
+    let heroEnd = 2.4 * window.innerHeight // fallback (scrollLengthVh 340 - 100)
+    const measure = () => {
+      const hero = document.getElementById('hero')
+      heroEnd = hero
+        ? hero.offsetTop + hero.offsetHeight - window.innerHeight
+        : 2.4 * window.innerHeight
+    }
     const onScroll = () => {
+      // Over light-background sections (data-nav-light-bg) the text flips to dark.
       let dark = false
       document.querySelectorAll<HTMLElement>('[data-nav-light-bg]').forEach((el) => {
         const r = el.getBoundingClientRect()
         if (r.top <= sample && r.bottom >= sample) dark = true
       })
       setDarkText(dark)
+
+      if (isLanding) {
+        if (window.scrollY < heroEnd) {
+          setNavFixed(true) // pinned over the hero animation
+        } else {
+          setNavFixed(false)
+          setNavTop(heroEnd) // released at the hero's end, scrolls away for good
+        }
+      } else {
+        setNavFixed(false)
+        setNavTop(0) // non-sticky: sits at the top and scrolls off
+      }
     }
+    measure()
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', onScroll)
+    const onResize = () => {
+      measure()
+      onScroll()
+    }
+    window.addEventListener('resize', onResize)
     return () => {
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', onScroll)
+      window.removeEventListener('resize', onResize)
     }
-  }, [pathname])
+  }, [pathname, isLanding])
 
   // On the homepage the hero locks scrolling until its animation completes.
   // Clicking a section link should release the hero and jump to the section.
@@ -59,9 +92,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`absolute top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+      className={`${navFixed ? 'fixed' : 'absolute'} left-0 right-0 z-50 transition-colors duration-300 ${
         darkText ? 'bg-transparent' : 'bg-gradient-to-b from-black/55 via-black/25 to-transparent'
       }`}
+      style={{ top: navFixed ? 0 : navTop }}
     >
       <div className="max-w-6xl mx-auto px-6 h-24 flex items-center justify-between">
         <Link href="/" onClick={goHome}>
