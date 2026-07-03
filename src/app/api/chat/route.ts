@@ -251,10 +251,27 @@ export async function POST(req: NextRequest) {
 
       // Execute tool calls and append results.
       for (const call of msg.tool_calls) {
-        const args =
-          typeof call.function.arguments === 'string'
-            ? JSON.parse(call.function.arguments)
-            : call.function.arguments
+        // Models sometimes emit malformed JSON in tool-call arguments. Never let a
+        // bad payload 502 the whole chat: recover and let the model ask the guest
+        // to restate their dates.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        let args: any = {}
+        try {
+          args =
+            typeof call.function.arguments === 'string'
+              ? JSON.parse(call.function.arguments || '{}')
+              : (call.function.arguments ?? {})
+        } catch {
+          msgs.push({
+            role: 'tool',
+            tool_call_id: call.id,
+            content: JSON.stringify({
+              error:
+                'Could not read the requested dates. Ask the guest to confirm their exact check-in and check-out dates (and villa, if any).',
+            }),
+          })
+          continue
+        }
 
         if (args.checkIn && args.checkOut && DATE.test(args.checkIn) && DATE.test(args.checkOut)) {
           stayDates = { checkIn: args.checkIn, checkOut: args.checkOut }
