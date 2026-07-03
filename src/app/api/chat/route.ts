@@ -81,6 +81,110 @@ async function searchAvailability(checkIn: string, checkOut: string, guests?: nu
   return { villas: results }
 }
 
+// Build a multi-villa "split stay" itinerary when no single villa covers the
+// whole range: chain each villa's available nights back-to-back with no gaps,
+// so the guest can stay the full period by moving between villas.
+async function findSplitStay(checkIn: string, checkOut: string, guests?: number) {
+  const start = Date.parse(checkIn)
+  const end = Date.parse(checkOut)
+  const nights = Math.round((end - start) / 86_400_000)
+  if (!Number.isFinite(nights) || nights <= 0) return { error: 'Invalid dates' }
+
+  // One entry per night of the stay (checkout morning is not a night).
+  const nightDates: string[] = []
+  const d = new Date(checkIn)
+  for (let i = 0; i < nights; i++) {
+    nightDates.push(ymd(d))
+    d.setDate(d.getDate() + 1)
+  }
+
+  const villas = await getVillasList()
+  const eligible = villas.filter((v) => !guests || v.guests >= guests)
+
+  type Info = Awaited<ReturnType<typeof getListingGuestInfo>>
+  type Row = { slug: string; name: string; minNights: number; avail: boolean[]; price: number[]; info: Info }
+
+  const rows = (
+    await Promise.all(
+      eligible.map(async (v): Promise<Row | null> => {
+        const listingId = getHostawayListingId(v.slug)
+        if (!listingId) return null
+        try {
+          const [days, info] = await Promise.all([
+            getCalendar(listingId, checkIn, checkOut),
+            getListingGuestInfo(listingId),
+          ])
+          const byDate = new Map(days.map((x) => [x.date, x]))
+          const avail = nightDates.map((dt) => {
+            const it = byDate.get(dt)
+            return !!it && it.isAvailable === 1 && it.status === 'available'
+          })
+          const price = nightDates.map((dt) => byDate.get(dt)?.price ?? 0)
+          return { slug: v.slug, name: v.name, minNights: info.minNights, avail, price, info }
+        } catch {
+          return null
+        }
+      }),
+    )
+  ).filter((r): r is Row => r !== null)
+
+  // Greedy minimum-move cover: at each open night, take the villa whose available
+  // run reaches furthest (and is long enough for its own minimum stay).
+  type Seg = {
+    slug: string
+    name: string
+    checkIn: string
+    checkOut: string
+    nights: number
+    accommodationTotal: number
+  }
+  const segments: Seg[] = []
+  let i = 0
+  while (i < nights) {
+    let best: Row | null = null
+    let bestEnd = i
+    for (const r of rows) {
+      if (!r.avail[i]) continue
+      let j = i
+      while (j < nights && r.avail[j]) j++
+      if (j - i < r.minNights) continue // this leg would be shorter than the villa's minimum stay
+      if (j > bestEnd) {
+        bestEnd = j
+        best = r
+      }
+    }
+    if (!best) {
+      return {
+        covered: false,
+        firstGapDate: nightDates[i],
+        note: 'No combination of villas can cover the full range without a gap.',
+      }
+    }
+    let total = 0
+    for (let k = i; k < bestEnd; k++) total += best.price[k]
+    const segNights = bestEnd - i
+    const mult = losDiscountMultiplier(segNights, best.info)
+    segments.push({
+      slug: best.slug,
+      name: best.name,
+      checkIn: nightDates[i],
+      checkOut: bestEnd < nights ? nightDates[bestEnd] : checkOut,
+      nights: segNights,
+      accommodationTotal: Math.round(total * mult),
+    })
+    i = bestEnd
+  }
+
+  return {
+    covered: true,
+    moves: segments.length,
+    currency: 'EUR',
+    segments,
+    grandTotal: segments.reduce((s, x) => s + x.accommodationTotal, 0),
+    note: 'Each villa change is a separate booking request. Prices are in EUR and confirmed by the host after the request.',
+  }
+}
+
 function buildSystemPrompt(kb: string) {
   return `You are Maya, the friendly online concierge for Your Bali Getaway (yourbaligetaway.com), a collection of five private pool villas in Seminyak, Bali. Your job is to help visitors find the right villa, answer their questions, and guide them toward sending a booking request.
 
@@ -97,6 +201,7 @@ WHAT YOU CAN TALK ABOUT (everything a guest should know)
 - Villa details: bedrooms, bathrooms, capacity, amenities, layout, location, the area, distances to beach/restaurants.
 - Public pricing: nightly "from" prices, cleaning fee, extra-guest fee, weekly/monthly discounts, minimum stay.
 - Availability and total price for specific dates. When the visitor asks about availability for dates WITHOUT naming a villa, call search_availability to list EVERY available villa for those dates. When they name a specific villa, use check_availability.
+- Split stays across villas: if NO single villa is available for the guest's full range, call find_split_stay to build an itinerary that covers the whole period by moving between villas (e.g. Bali Bliss for the first nights, then Bali Blue 1 for the rest). Present each leg on its own short line: villa, dates, nights and price, then the combined total. Frame it warmly as a way to still enjoy the full stay, not as a problem. Append one [BOOK:slug] line for EACH villa in the itinerary. Only suggest a split stay when a single villa cannot cover the whole range; if find_split_stay returns covered:false, tell them those exact dates can't be pieced together and offer WhatsApp.
 - Check-in/check-out times, booking process (request to book, host confirms), payment is arranged after confirmation.
 - Prices are quoted in EUR; mention visitors can switch the display currency on the site.
 
@@ -162,6 +267,23 @@ const TOOLS = [
       },
     },
   },
+  {
+    type: 'function',
+    function: {
+      name: 'find_split_stay',
+      description:
+        'Build a multi-villa itinerary ("split stay") that covers a full date range by chaining villas back-to-back. Use ONLY when no single villa is available for the whole range, to offer the guest a stay across 2+ villas. Returns each leg (villa, dates, nights, price) and the combined total, or covered:false if no gap-free combination exists.',
+      parameters: {
+        type: 'object',
+        properties: {
+          checkIn: { type: 'string', description: 'Check-in date, YYYY-MM-DD' },
+          checkOut: { type: 'string', description: 'Check-out date, YYYY-MM-DD' },
+          guests: { type: 'number', description: 'Number of guests (optional)' },
+        },
+        required: ['checkIn', 'checkOut'],
+      },
+    },
+  },
 ]
 
 export async function POST(req: NextRequest) {
@@ -212,6 +334,9 @@ export async function POST(req: NextRequest) {
 
     const DATE = /^\d{4}-\d{2}-\d{2}$/
     let stayDates: { checkIn: string; checkOut: string } | null = null
+    // Per-villa dates from a split-stay itinerary, so each villa's Book button
+    // pre-fills that leg's own dates rather than the whole (unavailable) range.
+    const legDates = new Map<string, { checkIn: string; checkOut: string }>()
     let text = ''
 
     // Resolve up to 3 rounds of tool calls.
@@ -282,6 +407,12 @@ export async function POST(req: NextRequest) {
           out = await checkAvailability(args.villa ?? '', args.checkIn ?? '', args.checkOut ?? '')
         } else if (call.function.name === 'search_availability') {
           out = await searchAvailability(args.checkIn ?? '', args.checkOut ?? '', args.guests)
+        } else if (call.function.name === 'find_split_stay') {
+          out = await findSplitStay(args.checkIn ?? '', args.checkOut ?? '', args.guests)
+          const r = out as { covered?: boolean; segments?: { slug: string; checkIn: string; checkOut: string }[] }
+          if (r.covered && r.segments) {
+            for (const s of r.segments) legDates.set(s.slug, { checkIn: s.checkIn, checkOut: s.checkOut })
+          }
         } else {
           out = { error: 'Unknown function' }
         }
@@ -307,11 +438,14 @@ export async function POST(req: NextRequest) {
     const unique = [...new Set(bookSlugs)]
     if (unique.length) {
       const list = await getVillasList()
-      const q = stayDates ? `?checkIn=${stayDates.checkIn}&checkOut=${stayDates.checkOut}` : ''
       cards = unique
         .map((slug): Card | null => {
           const v = list.find((x) => x.slug === slug)
-          return v ? { slug, name: v.name, coverUrl: v.coverUrl, href: `/villas/${slug}${q}#book` } : null
+          if (!v) return null
+          // A split-stay leg pre-fills its own dates; otherwise use the whole range.
+          const dts = legDates.get(slug) ?? stayDates
+          const q = dts ? `?checkIn=${dts.checkIn}&checkOut=${dts.checkOut}` : ''
+          return { slug, name: v.name, coverUrl: v.coverUrl, href: `/villas/${slug}${q}#book` }
         })
         .filter((c): c is Card => c !== null)
     }
