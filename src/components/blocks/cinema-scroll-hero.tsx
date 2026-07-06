@@ -9,7 +9,7 @@
  * WebP sequence drawn onto a <canvas> (no <video>), driven by GSAP ScrollTrigger.
  *
  * Mobile: to stay light and smooth on phones, we swap to a lower-resolution,
- * half-frame-count sequence (public/hero-seq-mobile, 1152×648, 122 frames ≈ 6.9MB
+ * half-frame-count sequence (public/hero-seq-mobile, 1280×720, 122 frames ≈ 8.8MB
  * vs the desktop 1600×900, 244 frames ≈ 30MB) and cap the canvas at 1× DPR.
  * Desktop rendering is unchanged.
  */
