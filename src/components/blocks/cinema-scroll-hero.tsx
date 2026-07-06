@@ -8,9 +8,10 @@
  * immersed in the pool scene. Every scroll pixel scrubs one frame of a pre-extracted
  * WebP sequence drawn onto a <canvas> (no <video>), driven by GSAP ScrollTrigger.
  *
- * Mobile: to stay light and smooth on phones, we swap to a lower-resolution,
- * half-frame-count sequence (public/hero-seq-mobile, 1280×720, 122 frames ≈ 8.8MB
- * vs the desktop 1600×900, 244 frames ≈ 30MB) and cap the canvas at 1× DPR.
+ * Mobile: to stay light on phones we swap to a reduced-frame-count sequence
+ * (public/hero-seq-mobile, 1600×900, 82 frames ≈ 8.3MB vs the desktop 1600×900,
+ * 244 frames ≈ 30MB). Same resolution and 2× DPR as desktop so it stays sharp;
+ * the download/memory saving comes from serving ~1/3 of the frames.
  * Desktop rendering is unchanged.
  */
 
@@ -35,7 +36,7 @@ const pad4 = (n: number) => String(n).padStart(4, '0')
 export default function CinemaScrollHero({
   frameCount = 244,
   framePath = (i) => `/hero-seq/frame_${pad4(i)}.webp`,
-  mobileFrameCount = 122,
+  mobileFrameCount = 82,
   mobileFramePath = (i) => `/hero-seq-mobile/frame_${pad4(i)}.webp`,
   title = 'Your Bali Getaway',
   kicker = 'Bali, Indonesia',
@@ -67,12 +68,13 @@ export default function CinemaScrollHero({
   const sizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    // Cap at 1× on phones: a lower-res source gains nothing from a 2×–3× canvas
-    // and the extra pixels are what make the scroll scrub stutter on mobile GPUs.
-    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2)
+    // Render at the device's real pixel density (capped at 2×) on mobile too —
+    // a 1× canvas gets stretched 2×–3× by the browser and looks blurry. The
+    // per-frame drawImage of a 2× canvas is cheap; frame decode is the real cost.
+    const dpr = Math.min(window.devicePixelRatio || 1, 2)
     canvas.width = Math.floor(window.innerWidth * dpr)
     canvas.height = Math.floor(window.innerHeight * dpr)
-  }, [isMobile])
+  }, [])
 
   const drawFrame = useCallback((target: number) => {
     const canvas = canvasRef.current
