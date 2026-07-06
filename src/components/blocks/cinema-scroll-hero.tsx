@@ -7,6 +7,11 @@
  * dollies from the villa living room *into* the home-cinema screen and ends fully
  * immersed in the pool scene. Every scroll pixel scrubs one frame of a pre-extracted
  * WebP sequence drawn onto a <canvas> (no <video>), driven by GSAP ScrollTrigger.
+ *
+ * Mobile: to stay light and smooth on phones, we swap to a lower-resolution,
+ * half-frame-count sequence (public/hero-seq-mobile, 854×480, 122 frames ≈ 4.6MB
+ * vs the desktop 1600×900, 244 frames ≈ 30MB) and cap the canvas at 1× DPR.
+ * Desktop rendering is unchanged.
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -15,6 +20,9 @@ import { gsap, ScrollTrigger, useGSAP, prefersReducedMotion } from '@/lib/gsap'
 interface CinemaScrollHeroProps {
   frameCount?: number
   framePath?: (i: number) => string
+  /** Lighter frame set + count used on phones (defaults to the hero-seq-mobile sequence). */
+  mobileFrameCount?: number
+  mobileFramePath?: (i: number) => string
   title?: string
   kicker?: string
   scrollHint?: string
@@ -27,6 +35,8 @@ const pad4 = (n: number) => String(n).padStart(4, '0')
 export default function CinemaScrollHero({
   frameCount = 244,
   framePath = (i) => `/hero-seq/frame_${pad4(i)}.webp`,
+  mobileFrameCount = 122,
+  mobileFramePath = (i) => `/hero-seq-mobile/frame_${pad4(i)}.webp`,
   title = 'Your Bali Getaway',
   kicker = 'Bali, Indonesia',
   scrollHint = 'Scroll to explore',
@@ -43,14 +53,26 @@ export default function CinemaScrollHero({
   const [ready, setReady] = useState(false)
   const [reduced, setReduced] = useState(false)
 
+  // Decide the device tier once, synchronously, before the preloader runs so we
+  // fetch the right frame set exactly once (no double download on phones).
+  const [isMobile] = useState(
+    () =>
+      typeof window !== 'undefined' &&
+      window.matchMedia('(max-width: 768px), (pointer: coarse) and (max-width: 926px)').matches
+  )
+  const activeFrameCount = isMobile ? mobileFrameCount : frameCount
+  const activeFramePath = isMobile ? mobileFramePath : framePath
+
   // ── Canvas helpers ────────────────────────────────────────────────────────
   const sizeCanvas = useCallback(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    // Cap at 1× on phones: a lower-res source gains nothing from a 2×–3× canvas
+    // and the extra pixels are what make the scroll scrub stutter on mobile GPUs.
+    const dpr = Math.min(window.devicePixelRatio || 1, isMobile ? 1 : 2)
     canvas.width = Math.floor(window.innerWidth * dpr)
     canvas.height = Math.floor(window.innerHeight * dpr)
-  }, [])
+  }, [isMobile])
 
   const drawFrame = useCallback((target: number) => {
     const canvas = canvasRef.current
@@ -59,7 +81,7 @@ export default function CinemaScrollHero({
     if (!ctx) return
 
     // Pick the requested frame, falling back to the nearest already-decoded one.
-    let idx = Math.max(0, Math.min(frameCount - 1, Math.round(target)))
+    let idx = Math.max(0, Math.min(activeFrameCount - 1, Math.round(target)))
     let img = imagesRef.current[idx]
     if (!img || !img.complete || img.naturalWidth === 0) {
       for (let j = idx; j >= 0; j--) {
@@ -82,7 +104,7 @@ export default function CinemaScrollHero({
     const dh = ih * scale
     ctx.clearRect(0, 0, cw, ch)
     ctx.drawImage(img, (cw - dw) / 2, (ch - dh) / 2, dw, dh)
-  }, [frameCount])
+  }, [activeFrameCount])
 
   // ── Reduced-motion probe ──────────────────────────────────────────────────
   useEffect(() => {
@@ -93,9 +115,9 @@ export default function CinemaScrollHero({
   useEffect(() => {
     let cancelled = false
     let count = 0
-    const imgs: HTMLImageElement[] = new Array(frameCount)
+    const imgs: HTMLImageElement[] = new Array(activeFrameCount)
 
-    for (let i = 1; i <= frameCount; i++) {
+    for (let i = 1; i <= activeFrameCount; i++) {
       const img = new Image()
       img.decoding = 'async'
       const onOne = () => {
@@ -109,7 +131,7 @@ export default function CinemaScrollHero({
       }
       img.onload = onOne
       img.onerror = onOne
-      img.src = framePath(i)
+      img.src = activeFramePath(i)
       imgs[i - 1] = img
     }
 
@@ -117,18 +139,18 @@ export default function CinemaScrollHero({
     return () => {
       cancelled = true
     }
-  }, [frameCount, framePath, sizeCanvas, drawFrame])
+  }, [activeFrameCount, activeFramePath, sizeCanvas, drawFrame])
 
   // Reveal when every frame is decoded, with a safety timeout for slow links.
   useEffect(() => {
     if (ready) return
-    if (loaded >= frameCount) {
+    if (loaded >= activeFrameCount) {
       setReady(true)
       return
     }
     const t = setTimeout(() => setReady(true), 6000)
     return () => clearTimeout(t)
-  }, [loaded, frameCount, ready])
+  }, [loaded, activeFrameCount, ready])
 
   // Lock scroll behind the loader so the sequence never plays half-loaded.
   useEffect(() => {
@@ -157,10 +179,10 @@ export default function CinemaScrollHero({
       if (reduced) {
         // Static, immersive end-frame. No pin, no scrub.
         sizeCanvas()
-        drawFrame(frameCount - 1)
+        drawFrame(activeFrameCount - 1)
         const onResize = () => {
           sizeCanvas()
-          drawFrame(frameCount - 1)
+          drawFrame(activeFrameCount - 1)
         }
         window.addEventListener('resize', onResize)
         return () => window.removeEventListener('resize', onResize)
@@ -175,7 +197,7 @@ export default function CinemaScrollHero({
 
       // Frame scrub: 0 → last across the pinned distance.
       gsap.to(frameRef.current, {
-        i: frameCount - 1,
+        i: activeFrameCount - 1,
         ease: 'none',
         onUpdate: render,
         scrollTrigger: {
@@ -225,10 +247,10 @@ export default function CinemaScrollHero({
       ScrollTrigger.refresh()
       return () => window.removeEventListener('resize', onResize)
     },
-    { scope: sectionRef, dependencies: [ready, reduced] }
+    { scope: sectionRef, dependencies: [ready, reduced, activeFrameCount] }
   )
 
-  const progress = Math.round((loaded / frameCount) * 100)
+  const progress = Math.round((loaded / activeFrameCount) * 100)
 
   // Typography matched to the live site: split serif title + italic subtitle + gold cue.
   const firstWord = title ? title.split(' ')[0] : ''
