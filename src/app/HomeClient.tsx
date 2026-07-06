@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import Navbar from '@/components/Navbar'
@@ -8,6 +8,7 @@ import Footer from '@/components/Footer'
 import VillaSearch from '@/components/VillaSearch'
 import ReviewCarousel from '@/components/ReviewCarousel'
 import CinemaScrollHero from '@/components/blocks/cinema-scroll-hero'
+import ScrollExpandMedia from '@/components/blocks/scroll-expansion-hero'
 import { useCurrency } from '@/components/CurrencyProvider'
 import { useLanguage } from '@/components/LanguageProvider'
 import { gsap, useGSAP, prefersReducedMotion } from '@/lib/gsap'
@@ -17,6 +18,17 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
   const { format } = useCurrency()
   const { t } = useLanguage()
   const rootRef = useRef<HTMLDivElement>(null)
+
+  // Pick the hero per device: phones get the lighter video-zoom hero (hero.mp4
+  // inside hero1.jpg); desktop keeps the scroll-scrubbed 4K frame sequence.
+  // Resolved after mount so a phone never downloads the heavy frame set.
+  const [heroMode, setHeroMode] = useState<'pending' | 'mobile' | 'desktop'>('pending')
+  useEffect(() => {
+    const isMobile = window.matchMedia(
+      '(max-width: 767px), (pointer: coarse) and (max-width: 926px)'
+    ).matches
+    setHeroMode(isMobile ? 'mobile' : 'desktop')
+  }, [])
 
   useGSAP(
     () => {
@@ -86,14 +98,38 @@ export default function HomeClient({ villas }: { villas: VillaCard[] }) {
     <div ref={rootRef} className="min-h-screen bg-villa-cream">
       <Navbar />
 
-      {/* ── Hero (scroll-scrubbed 4K: V3 villa→cinema, V5 zoom, V2 immersive enter→pool) ── */}
-      <CinemaScrollHero
-        frameCount={244}
-        scrollLengthVh={340}
-        title="Your Bali Getaway"
-        kicker={t('Bali, Indonesia')}
-        scrollHint={t('Scroll to explore')}
-      />
+      {/* ── Hero ── desktop: scroll-scrubbed 4K frame sequence. mobile: lighter
+          video-zoom hero (hero.mp4 inside hero1.jpg). Resolved client-side so a
+          phone never downloads the heavy frame set. ── */}
+      {heroMode === 'desktop' && (
+        <CinemaScrollHero
+          frameCount={244}
+          scrollLengthVh={340}
+          title="Your Bali Getaway"
+          kicker={t('Bali, Indonesia')}
+          scrollHint={t('Scroll to explore')}
+        />
+      )}
+      {heroMode === 'mobile' && (
+        <ScrollExpandMedia
+          mediaType="video"
+          mediaSrc="/hero.mp4"
+          bgImageSrc="/hero1.jpg"
+          title="Your Bali Getaway"
+          date={t('Bali, Indonesia')}
+          scrollToExpand={t('Scroll to explore')}
+          textBlend
+        />
+      )}
+      {heroMode === 'pending' && (
+        <div className="relative h-[100dvh] w-full bg-villa-dark" aria-hidden="true">
+          <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+            <h2 className="font-serif text-5xl font-light tracking-wide text-white/90 md:text-6xl lg:text-7xl">
+              Your Bali Getaway
+            </h2>
+          </div>
+        </div>
+      )}
 
 
       {/* ── Villa Collection ── */}
