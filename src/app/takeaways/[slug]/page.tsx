@@ -8,7 +8,7 @@ import Reveal from '@/components/takeaways/Reveal'
 import ArticleCard from '@/components/takeaways/ArticleCard'
 import JoelPicks from '@/components/takeaways/JoelPicks'
 import RecFeed from '@/components/takeaways/RecFeed'
-import { getArticleBySlug, getArticleSlugs, getArticlesList, getApprovedRecs, categoryLabel } from '@/lib/takeaways'
+import { getArticleBySlug, getArticlesList, getApprovedRecs, categoryLabel } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
@@ -17,10 +17,10 @@ interface Props {
   params: Promise<{ slug: string }>
 }
 
-export async function generateStaticParams() {
-  const slugs = await getArticleSlugs()
-  return slugs.map((slug) => ({ slug }))
-}
+// Render per request: the page reads the locale cookie and translates content
+// per locale, so it is dynamic. An unknown slug then resolves to a clean 404
+// (a static render of an unknown slug throws DYNAMIC_SERVER_USAGE on cookies()).
+export const dynamic = 'force-dynamic'
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
