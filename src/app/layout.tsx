@@ -5,8 +5,10 @@ import { LanguageProvider } from '@/components/LanguageProvider'
 import ChatWidget from '@/components/ChatWidget'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
+import { SITE_URL } from '@/lib/site'
 
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: 'Luxury Private Pool Villas in Bali | Your Bali Getaway',
   description:
     'Book one of five private pool villas in Bali direct with the host. No platform fees, best rates, and instant WhatsApp confirmation for your luxury Bali stay.',

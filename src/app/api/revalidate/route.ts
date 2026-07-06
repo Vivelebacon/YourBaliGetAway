@@ -12,9 +12,15 @@ export async function POST(req: NextRequest) {
 
   const body = await req.json().catch(() => ({}))
   const slug = typeof body.slug === 'string' ? body.slug : undefined
+  const scope = typeof body.scope === 'string' ? body.scope : 'villas'
 
   revalidatePath('/')
-  if (slug) revalidatePath(`/villas/${slug}`)
+  if (scope === 'takeaways') {
+    revalidatePath('/takeaways')
+    if (slug) revalidatePath(`/takeaways/${slug}`)
+  } else if (slug) {
+    revalidatePath(`/villas/${slug}`)
+  }
 
   return NextResponse.json({ ok: true })
 }

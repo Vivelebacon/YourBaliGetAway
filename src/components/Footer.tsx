@@ -32,6 +32,19 @@ export default function Footer() {
               </li>
             ))}
           </ul>
+          <h4 className="font-serif text-lg text-white mb-3 mt-6">{t('Insider Guide')}</h4>
+          <ul className="space-y-2 text-sm">
+            <li>
+              <Link href="/takeaways" className="hover:text-villa-gold transition-colors">
+                {t('Our Bali Takeaways')}
+              </Link>
+            </li>
+            <li>
+              <Link href="/takeaways/community" className="hover:text-villa-gold transition-colors">
+                {t('The community wall')}
+              </Link>
+            </li>
+          </ul>
         </div>
 
         <div>

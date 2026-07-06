@@ -120,6 +120,9 @@ export default function Navbar() {
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className={linkClass}>
             {t('Our Villas')}
           </Link>
+          <Link href="/takeaways" onClick={() => setOpen(false)} className={linkClass}>
+            {t('Our Bali Takeaways')}
+          </Link>
           <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className={linkClass}>
             {t('Book')}
           </Link>
@@ -153,6 +156,7 @@ export default function Navbar() {
         <div className="md:hidden bg-white/95 backdrop-blur-sm border-t border-stone-200 px-6 py-4 flex flex-col gap-4">
           <Link href="/" onClick={goHome} className="text-villa-dark hover:text-villa-green">{t('Home')}</Link>
           <Link href="/#villas" onClick={(e) => goToSection(e, 'villas')} className="text-villa-dark hover:text-villa-green">{t('Our Villas')}</Link>
+          <Link href="/takeaways" onClick={() => setOpen(false)} className="text-villa-dark hover:text-villa-green">{t('Our Bali Takeaways')}</Link>
           <Link href="/#book" onClick={(e) => goToSection(e, 'book')} className="text-villa-dark hover:text-villa-green">{t('Book')}</Link>
           <Link href="/#contact" onClick={(e) => goToSection(e, 'contact')} className="text-villa-dark hover:text-villa-green">{t('Contact')}</Link>
           <div className="flex items-center gap-2">

@@ -46,5 +46,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  // /admin: auth guard. /takeaways: session refresh so member state
+  // (likes, comments, insider picks) survives token expiry.
+  matcher: ['/admin/:path*', '/takeaways/:path*'],
 }
