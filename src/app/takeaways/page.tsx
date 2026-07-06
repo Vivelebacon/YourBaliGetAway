@@ -78,49 +78,69 @@ export default async function TakeawaysPage() {
         </div>
       </section>
 
-      {/* ── Featured ── */}
-      {featured.length > 0 && (
-        <section data-nav-light-bg className="px-6 py-16">
-          <div className="mx-auto max-w-6xl">
-            <Reveal className="mb-10 text-center">
-              <p className="mb-3 text-sm uppercase tracking-[0.3em] text-villa-gold">{t('Featured')}</p>
-              <h2 className="font-serif text-4xl font-light text-villa-dark md:text-5xl">
-                {t('Our Bali Takeaways')}
-              </h2>
-              <div className="mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
-            </Reveal>
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-              {featured.map((a, i) => (
-                <Reveal key={a.slug} delay={i * 0.08}>
-                  <ArticleCard
-                    article={a}
-                    categoryLabel={t(categoryLabel(a.category))}
-                    readLabel={t('Read article')}
-                    large
-                  />
+      {articles.length > 0 ? (
+        <>
+          {/* ── Featured ── */}
+          {featured.length > 0 && (
+            <section data-nav-light-bg className="px-6 py-16">
+              <div className="mx-auto max-w-6xl">
+                <Reveal className="mb-10 text-center">
+                  <p className="mb-3 text-sm uppercase tracking-[0.3em] text-villa-gold">{t('Featured')}</p>
+                  <h2 className="font-serif text-4xl font-light text-villa-dark md:text-5xl">
+                    {t('Our Bali Takeaways')}
+                  </h2>
+                  <div className="mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
                 </Reveal>
-              ))}
+                <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+                  {featured.map((a, i) => (
+                    <Reveal key={a.slug} delay={i * 0.08}>
+                      <ArticleCard
+                        article={a}
+                        categoryLabel={t(categoryLabel(a.category))}
+                        readLabel={t('Read article')}
+                        large
+                      />
+                    </Reveal>
+                  ))}
+                </div>
+              </div>
+            </section>
+          )}
+
+          {/* ── All guides ── */}
+          <section data-nav-light-bg className="px-6 pb-20">
+            <div className="mx-auto max-w-6xl">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+                {rest.map((a, i) => (
+                  <Reveal key={a.slug} delay={(i % 3) * 0.08}>
+                    <ArticleCard
+                      article={a}
+                      categoryLabel={t(categoryLabel(a.category))}
+                      readLabel={t('Read article')}
+                    />
+                  </Reveal>
+                ))}
+              </div>
             </div>
-          </div>
+          </section>
+        </>
+      ) : (
+        /* ── No articles yet: elegant "coming soon" state ── */
+        <section data-nav-light-bg className="px-6 py-24">
+          <Reveal className="mx-auto max-w-xl text-center">
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-full bg-villa-gold/15 text-2xl text-villa-gold">
+              ✦
+            </div>
+            <h2 className="font-serif text-3xl font-light text-villa-dark md:text-4xl">
+              {t('Recommendations coming soon')}
+            </h2>
+            <p className="mx-auto mt-4 max-w-md text-villa-muted">
+              {t('Our hosts are writing up their favourite Bali spots. Check back very soon, or share your own below.')}
+            </p>
+            <div className="mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
+          </Reveal>
         </section>
       )}
-
-      {/* ── All guides ── */}
-      <section data-nav-light-bg className="px-6 pb-20">
-        <div className="mx-auto max-w-6xl">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-            {rest.map((a, i) => (
-              <Reveal key={a.slug} delay={(i % 3) * 0.08}>
-                <ArticleCard
-                  article={a}
-                  categoryLabel={t(categoryLabel(a.category))}
-                  readLabel={t('Read article')}
-                />
-              </Reveal>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── 3D scroll moment: step inside the villas ── */}
       <ScrubShowcase />

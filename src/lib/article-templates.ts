@@ -1,0 +1,118 @@
+// Ready-made article scaffolds for the Takeaways CMS. Joel picks one when
+// creating an article: it pre-fills the category and a structured body with
+// headings and prompts, so he only has to fill in the blanks.
+// Client-safe: no server-only imports.
+
+export interface ArticleTemplate {
+  id: string
+  label: string
+  category: string
+  hint: string
+  excerpt: string
+  body: string
+  joelPicks: string
+}
+
+export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
+  {
+    id: 'restaurants',
+    label: 'Restaurants / where to eat',
+    category: 'food',
+    hint: 'A shortlist of the best places to eat in an area.',
+    excerpt: 'Where we send our guests to eat: our favourite tables nearby, from a casual bite to a long dinner.',
+    body: `<p><em>Set the scene in one or two lines: what is the food like in this area, and who is this guide for?</em></p>
+<h2>For a special dinner</h2>
+<p><strong>[Restaurant name]</strong> — <em>what makes it special, what to order, and a booking tip.</em></p>
+<h2>For brunch and coffee</h2>
+<ul><li><strong>[Place]</strong>: <em>one line on why you love it.</em></li><li><strong>[Place]</strong>: <em>one line on why you love it.</em></li></ul>
+<h2>For a casual bite</h2>
+<p><em>A warung or local spot worth knowing, and what to try there.</em></p>`,
+    joelPicks: `<p><em>The insider bit (members only): the exact table to ask for, the best time to arrive, and the one dish most people miss.</em></p>`,
+  },
+  {
+    id: 'wellness',
+    label: 'Massage / spa / wellness',
+    category: 'wellness',
+    hint: 'Where to relax: spas, massages, yoga.',
+    excerpt: 'Make wellness a daily habit in Bali. Here is where to go, what to book and how much to pay.',
+    body: `<p><em>Why is this worth doing in Bali? Set expectations on quality and price.</em></p>
+<h2>The best addresses</h2>
+<p><strong>[Spa name]</strong> — <em>what they are known for, and which treatment to book.</em></p>
+<h2>Everyday value</h2>
+<ul><li><em>A rule of thumb for picking a good street spa.</em></li><li><em>What to say about pressure and timing.</em></li></ul>
+<h2>At the villa</h2>
+<p><em>How guests can book an in-villa treatment through you.</em></p>`,
+    joelPicks: `<p><em>Members only: the exact therapist or time slot you'd book, and the in-villa option most guests don't know about.</em></p>`,
+  },
+  {
+    id: 'beaches',
+    label: 'Beaches / sunset spots',
+    category: 'beaches',
+    hint: 'Where to swim, surf and watch the sunset.',
+    excerpt: 'Not all Bali beaches are equal, and sunset is the daily main event. Where to go and when.',
+    body: `<p><em>Set expectations: what are the beaches near the villas good for?</em></p>
+<h2>The local beaches</h2>
+<ul><li><strong>[Beach]</strong>: <em>what it's good for.</em></li><li><strong>[Beach]</strong>: <em>what it's good for.</em></li></ul>
+<h2>Worth the drive</h2>
+<p><em>A beach or two further out that's worth the trip.</em></p>
+<h2>Sunset tips</h2>
+<p><em>What time to arrive, where to sit, and how to make the most of it.</em></p>`,
+    joelPicks: `<p><em>Members only: your secret sunset spot and the exact time to be there.</em></p>`,
+  },
+  {
+    id: 'daytrip',
+    label: 'Day trip / things to do',
+    category: 'explore',
+    hint: 'A destination or activity within reach of the villa.',
+    excerpt: 'You do not need to move hotels to see the famous Bali. Here is a day trip worth planning.',
+    body: `<p><em>What is this place, and why is it worth a day?</em></p>
+<h2>What to see</h2>
+<p><em>The main sights, in the order you'd do them.</em></p>
+<h2>When to go</h2>
+<p><em>Best time of day, and how to beat the crowds.</em></p>
+<h2>Getting there</h2>
+<p><em>How to arrange a driver, roughly what it costs, and how to book through you.</em></p>`,
+    joelPicks: `<p><em>Members only: the smarter way to do this trip that avoids the crowds and the traffic.</em></p>`,
+  },
+  {
+    id: 'joel',
+    label: "Joel's special",
+    category: 'joel',
+    hint: 'A personal pick or a perfect day, in your own voice.',
+    excerpt: 'A personal recommendation from your host, tried and tested.',
+    body: `<p><em>Tell it in your own voice: what is this, and why do you love it?</em></p>
+<h2>The story</h2>
+<p><em>How you found it, or how you'd spend the day.</em></p>
+<h2>What to do</h2>
+<p><em>The specifics: where, when, what to order or ask for.</em></p>`,
+    joelPicks: `<p><em>Members only: the detail you'd only tell a friend.</em></p>`,
+  },
+  {
+    id: 'practical',
+    label: 'Practical tips',
+    category: 'practical',
+    hint: 'Money, scooters, etiquette, health, SIM cards.',
+    excerpt: 'The unglamorous knowledge that makes a Bali trip smooth: cash, transport and etiquette.',
+    body: `<p><em>One line on why this matters.</em></p>
+<h2>Money</h2>
+<ul><li><em>Cash, ATMs, cards.</em></li></ul>
+<h2>Getting around</h2>
+<p><em>Grab / Gojek, scooters, drivers.</em></p>
+<h2>Etiquette and health</h2>
+<ul><li><em>Temple dress, offerings on the pavement.</em></li><li><em>Water, pharmacies, the basics.</em></li></ul>`,
+    joelPicks: `<p><em>Members only: the one tip you wish every guest knew before they landed.</em></p>`,
+  },
+  {
+    id: 'blank',
+    label: 'Blank article',
+    category: 'explore',
+    hint: 'Start from an empty page.',
+    excerpt: '',
+    body: '',
+    joelPicks: '',
+  },
+]
+
+export function getTemplate(id: string): ArticleTemplate {
+  return ARTICLE_TEMPLATES.find((t) => t.id === id) ?? ARTICLE_TEMPLATES[ARTICLE_TEMPLATES.length - 1]
+}
