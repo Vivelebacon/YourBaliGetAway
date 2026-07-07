@@ -115,8 +115,10 @@ drop policy if exists "admin write articles" on public.takeaway_articles;
 create policy "admin write articles" on public.takeaway_articles for all
   using (public.is_admin()) with check (public.is_admin());
 
+-- Community is members-only: only authenticated members (and admins) can read
+-- recs/comments/likes. The `to authenticated` clause denies the anon role.
 drop policy if exists "read approved recs" on public.takeaway_recs;
-create policy "read approved recs" on public.takeaway_recs for select
+create policy "read approved recs" on public.takeaway_recs for select to authenticated
   using (status = 'approved' or user_id = auth.uid() or public.is_admin());
 drop policy if exists "members insert own recs" on public.takeaway_recs;
 create policy "members insert own recs" on public.takeaway_recs for insert to authenticated
@@ -130,7 +132,7 @@ create policy "authors delete own recs" on public.takeaway_recs for delete to au
   using (user_id = auth.uid() or public.is_admin());
 
 drop policy if exists "read likes" on public.takeaway_rec_likes;
-create policy "read likes" on public.takeaway_rec_likes for select using (true);
+create policy "read likes" on public.takeaway_rec_likes for select to authenticated using (true);
 drop policy if exists "members like" on public.takeaway_rec_likes;
 create policy "members like" on public.takeaway_rec_likes for insert to authenticated
   with check (user_id = auth.uid());
@@ -139,7 +141,7 @@ create policy "members unlike" on public.takeaway_rec_likes for delete to authen
   using (user_id = auth.uid());
 
 drop policy if exists "read comments" on public.takeaway_rec_comments;
-create policy "read comments" on public.takeaway_rec_comments for select using (true);
+create policy "read comments" on public.takeaway_rec_comments for select to authenticated using (true);
 drop policy if exists "members comment" on public.takeaway_rec_comments;
 create policy "members comment" on public.takeaway_rec_comments for insert to authenticated
   with check (user_id = auth.uid());

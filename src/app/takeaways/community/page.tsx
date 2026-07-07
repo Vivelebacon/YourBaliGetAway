@@ -3,7 +3,6 @@ import Image from 'next/image'
 import Navbar from '@/components/Navbar'
 import Footer from '@/components/Footer'
 import RecFeed from '@/components/takeaways/RecFeed'
-import { getApprovedRecs } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { SITE_URL } from '@/lib/site'
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
 
 export default async function CommunityPage() {
   const locale = await getLocale()
-  const [recs, messages] = await Promise.all([getApprovedRecs(10), getMessages(locale)])
+  const messages = await getMessages(locale)
   const t = (s: string) => messages[s] ?? s
 
   return (
@@ -53,7 +52,7 @@ export default async function CommunityPage() {
       {/* ── Feed ── */}
       <section data-nav-light-bg className="px-6 py-14">
         <div className="mx-auto max-w-3xl">
-          <RecFeed initialRecs={recs} showComposer pageSize={10} />
+          <RecFeed showComposer pageSize={10} />
         </div>
       </section>
 

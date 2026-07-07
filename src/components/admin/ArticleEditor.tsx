@@ -3,13 +3,14 @@
 // CMS editor for a Takeaways article: content, cover, Joel's insider picks
 // (the members-only block) and publish controls. Saves through RLS-checked
 // admin writes, then revalidates the live pages.
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { imageUrl, slugifyFilename } from '@/lib/admin'
 import { TAKEAWAY_CATEGORIES } from '@/lib/takeaways-shared'
+import { templateForCategory } from '@/lib/article-templates'
 import RichTextEditor from './RichTextEditor'
 
 export interface ArticleRow {
@@ -54,6 +55,30 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+
+  // Which category's template the current content came from. Lets us swap the
+  // template when the category changes, without clobbering edited content.
+  const contentCatRef = useRef(initial.category)
+
+  function changeCategory(nextCat: string) {
+    const prev = templateForCategory(contentCatRef.current)
+    const next = templateForCategory(nextCat)
+    setCategory(nextCat)
+    if (next.id === prev.id) return // same template, nothing to swap
+
+    const untouched = body === prev.body && excerpt === prev.excerpt && picks === prev.joelPicks
+    const apply =
+      untouched ||
+      window.confirm(
+        `Load the "${next.label}" template?\n\nThis replaces the article body, excerpt and Joel's picks with the ${next.label} layout. Click Cancel to just change the category and keep your text.`,
+      )
+    if (apply) {
+      setBody(next.body)
+      setExcerpt(next.excerpt)
+      setPicks(next.joelPicks)
+      contentCatRef.current = nextCat
+    }
+  }
 
   async function save() {
     if (saving) return
@@ -155,7 +180,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-stone-700">Category</label>
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className={field}>
+            <select value={category} onChange={(e) => changeCategory(e.target.value)} className={field}>
               {TAKEAWAY_CATEGORIES.map((c) => (
                 <option key={c.slug} value={c.slug}>
                   {c.label}

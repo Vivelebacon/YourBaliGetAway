@@ -1,14 +1,29 @@
 'use client'
 
 // Community feed: guest recommendations with likes and comments.
-// Reads are server-seeded (initialRecs, SEO-friendly); every interaction
-// (post, like, comment) runs client-side through RLS-checked Supabase calls.
+// Members only: RLS blocks anonymous reads, so recs are fetched client-side
+// with the member's session. Non-members see a join gate instead of any
+// recommendations. Every interaction runs through RLS-checked Supabase calls.
 import { useEffect, useMemo, useState } from 'react'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { TAKEAWAY_CATEGORIES, type CommunityRec } from '@/lib/takeaways-shared'
 import { useMember } from './MemberProvider'
 import { useLanguage } from '@/components/LanguageProvider'
+
+function mapRec(r: Record<string, unknown>): CommunityRec {
+  return {
+    id: r.id as string,
+    authorName: r.author_name as string,
+    category: r.category as string,
+    title: r.title as string,
+    body: r.body as string,
+    placeName: (r.place_name as string | null) ?? null,
+    area: (r.area as string | null) ?? null,
+    likesCount: (r.likes_count as number) ?? 0,
+    createdAt: r.created_at as string,
+  }
+}
 
 interface RecComment {
   id: string
@@ -27,24 +42,54 @@ function timeAgo(iso: string): string {
 }
 
 export default function RecFeed({
-  initialRecs,
+  category,
   showComposer = true,
   pageSize = 10,
 }: {
-  initialRecs: CommunityRec[]
+  category?: string
   showComposer?: boolean
   pageSize?: number
 }) {
   const supabase = useMemo(() => createClient(), [])
-  const { user, displayName, isAdmin } = useMember()
+  const { user, displayName, isAdmin, loading: memberLoading } = useMember()
   const { t } = useLanguage()
 
-  const [recs, setRecs] = useState<CommunityRec[]>(initialRecs)
+  const [recs, setRecs] = useState<CommunityRec[]>([])
+  const [feedLoading, setFeedLoading] = useState(true)
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set())
   const [openComments, setOpenComments] = useState<Set<string>>(new Set())
   const [comments, setComments] = useState<Record<string, RecComment[]>>({})
   const [commentDraft, setCommentDraft] = useState<Record<string, string>>({})
-  const [hasMore, setHasMore] = useState(initialRecs.length >= pageSize)
+  const [hasMore, setHasMore] = useState(false)
+
+  // Members only: fetch the feed with the member's session (anon is blocked by RLS).
+  useEffect(() => {
+    if (memberLoading) return
+    if (!user) {
+      setRecs([])
+      setFeedLoading(false)
+      return
+    }
+    let cancelled = false
+    setFeedLoading(true)
+    let q = supabase
+      .from('takeaway_recs')
+      .select('id,author_name,category,title,body,place_name,area,likes_count,created_at')
+      .eq('status', 'approved')
+      .order('created_at', { ascending: false })
+      .range(0, pageSize - 1)
+    if (category) q = q.eq('category', category)
+    q.then(({ data }) => {
+      if (cancelled) return
+      const rows = (data ?? []).map(mapRec)
+      setRecs(rows)
+      setHasMore(rows.length >= pageSize)
+      setFeedLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [user, memberLoading, category, pageSize, supabase])
 
   // Which of the visible recs has the member already liked?
   useEffect(() => {
@@ -126,51 +171,60 @@ export default function RecFeed({
   }
 
   async function loadMore() {
-    const { data } = await supabase
+    let q = supabase
       .from('takeaway_recs')
       .select('id,author_name,category,title,body,place_name,area,likes_count,created_at')
       .eq('status', 'approved')
       .order('created_at', { ascending: false })
       .range(recs.length, recs.length + pageSize - 1)
-    const more: CommunityRec[] = (data ?? []).map((r) => ({
-      id: r.id as string,
-      authorName: r.author_name as string,
-      category: r.category as string,
-      title: r.title as string,
-      body: r.body as string,
-      placeName: (r.place_name as string | null) ?? null,
-      area: (r.area as string | null) ?? null,
-      likesCount: (r.likes_count as number) ?? 0,
-      createdAt: r.created_at as string,
-    }))
+    if (category) q = q.eq('category', category)
+    const { data } = await q
+    const more = (data ?? []).map(mapRec)
     setRecs((prev) => [...prev, ...more])
     setHasMore(more.length >= pageSize)
+  }
+
+  // Non-members never see recommendations: show the join gate instead.
+  if (!memberLoading && !user) {
+    return (
+      <div className="rounded-2xl border border-dashed border-villa-green/40 bg-white/70 p-8 text-center">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-villa-green/10 text-xl text-villa-green">
+          ✦
+        </div>
+        <h3 className="font-serif text-2xl font-light text-villa-dark">{t('A members-only community')}</h3>
+        <p className="mx-auto mt-2 max-w-md text-sm text-villa-muted">
+          {t('Create a free account to see and share Bali recommendations from fellow guests.')}
+        </p>
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+          <Link
+            href="/takeaways/join"
+            className="rounded-full bg-villa-green px-7 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light"
+          >
+            {t('Create a free account')}
+          </Link>
+          <Link href="/takeaways/join?mode=signin" className="text-sm font-medium text-villa-green hover:underline">
+            {t('Sign in')}
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (memberLoading || feedLoading) {
+    return (
+      <div className="space-y-4" aria-hidden="true">
+        {[0, 1, 2].map((i) => (
+          <div key={i} className="h-28 animate-pulse rounded-2xl bg-white/60 ring-1 ring-stone-100" />
+        ))}
+      </div>
+    )
   }
 
   return (
     <div>
       {showComposer && (
         <div className="mb-10">
-          {user ? (
-            <Composer
-              onPosted={(rec) => setRecs((prev) => [rec, ...prev])}
-            />
-          ) : (
-            <div className="rounded-2xl border border-dashed border-villa-green/40 bg-white/70 p-6 text-center">
-              <p className="text-sm text-villa-muted">{t('Sign in to share your own recommendation')}</p>
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
-                <Link
-                  href="/takeaways/join"
-                  className="rounded-full bg-villa-green px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light"
-                >
-                  {t('Create a free account')}
-                </Link>
-                <Link href="/takeaways/join?mode=signin" className="text-sm font-medium text-villa-green hover:underline">
-                  {t('Sign in')}
-                </Link>
-              </div>
-            </div>
-          )}
+          <Composer onPosted={(rec) => setRecs((prev) => [rec, ...prev])} />
         </div>
       )}
 

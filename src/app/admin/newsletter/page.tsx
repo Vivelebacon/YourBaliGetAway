@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
-import CopyEmailsButton from '@/components/admin/CopyEmailsButton'
+import MemberExport, { type MemberRow } from '@/components/admin/MemberExport'
 import NewsletterComposer, { type NewsletterDraft } from '@/components/admin/NewsletterComposer'
 
 export const dynamic = 'force-dynamic'
@@ -23,6 +23,12 @@ export default async function AdminNewsletter() {
   const members = memberData ?? []
   const subscribers = members.filter((m) => m.newsletter_opt_in && m.email)
   const emails = subscribers.map((s) => s.email as string)
+  const memberRows: MemberRow[] = members.map((m) => ({
+    email: (m.email as string) ?? '',
+    displayName: (m.display_name as string) ?? '',
+    newsletter: !!m.newsletter_opt_in,
+    joined: new Date(m.created_at as string).toISOString().slice(0, 10),
+  }))
 
   return (
     <div>
@@ -41,7 +47,7 @@ export default async function AdminNewsletter() {
           <p className="text-sm text-stone-500">total members</p>
         </div>
         <div className="ml-auto">
-          <CopyEmailsButton emails={emails} />
+          <MemberExport emails={emails} members={memberRows} />
         </div>
       </div>
 

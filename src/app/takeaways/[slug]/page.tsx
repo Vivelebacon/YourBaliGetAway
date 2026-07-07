@@ -8,7 +8,7 @@ import Reveal from '@/components/takeaways/Reveal'
 import ArticleCard from '@/components/takeaways/ArticleCard'
 import JoelPicks from '@/components/takeaways/JoelPicks'
 import RecFeed from '@/components/takeaways/RecFeed'
-import { getArticleBySlug, getArticlesList, getApprovedRecs, categoryLabel } from '@/lib/takeaways'
+import { getArticleBySlug, getArticlesList, categoryLabel } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
@@ -46,11 +46,7 @@ export default async function TakeawayArticlePage({ params }: Props) {
   const article = await getArticleBySlug(slug, locale)
   if (!article) notFound()
 
-  const [messages, all, recs] = await Promise.all([
-    getMessages(locale),
-    getArticlesList(locale),
-    getApprovedRecs(3, article.category),
-  ])
+  const [messages, all] = await Promise.all([getMessages(locale), getArticlesList(locale)])
   const t = (s: string) => messages[s] ?? s
   const related = all.filter((a) => a.slug !== slug && a.category === article.category).slice(0, 3)
   const fallbackRelated = related.length > 0 ? related : all.filter((a) => a.slug !== slug).slice(0, 3)
@@ -127,7 +123,7 @@ export default async function TakeawayArticlePage({ params }: Props) {
             </h2>
             <div className="mx-auto mt-5 h-px w-16 bg-villa-gold/70" />
           </Reveal>
-          <RecFeed initialRecs={recs} showComposer={false} pageSize={99} />
+          <RecFeed category={article.category} showComposer={false} pageSize={10} />
           <div className="mt-8 text-center">
             <Link
               href="/takeaways/community"

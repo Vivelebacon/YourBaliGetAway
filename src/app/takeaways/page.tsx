@@ -6,8 +6,7 @@ import TakeawaysHero from '@/components/takeaways/TakeawaysHero'
 import ScrubShowcase from '@/components/takeaways/ScrubShowcase'
 import Reveal from '@/components/takeaways/Reveal'
 import ArticleCard from '@/components/takeaways/ArticleCard'
-import RecFeed from '@/components/takeaways/RecFeed'
-import { getArticlesList, getApprovedRecs, TAKEAWAY_CATEGORIES, categoryLabel } from '@/lib/takeaways'
+import { getArticlesList, TAKEAWAY_CATEGORIES, categoryLabel } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages, translateTexts } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
@@ -29,11 +28,7 @@ export const metadata: Metadata = {
 
 export default async function TakeawaysPage() {
   const locale = await getLocale()
-  const [articles, recs, messages] = await Promise.all([
-    getArticlesList(locale),
-    getApprovedRecs(3),
-    getMessages(locale),
-  ])
+  const [articles, messages] = await Promise.all([getArticlesList(locale), getMessages(locale)])
   const t = (s: string) => messages[s] ?? s
 
   const featured = articles.filter((a) => a.featured)
@@ -156,7 +151,6 @@ export default async function TakeawaysPage() {
             <p className="mx-auto mt-4 max-w-lg text-villa-muted">{t('Real tips left by guests who stayed with us.')}</p>
             <div className="mx-auto mt-6 h-px w-16 bg-villa-gold/70" />
           </Reveal>
-          <RecFeed initialRecs={recs} showComposer={false} pageSize={99} />
           <div className="mt-10 text-center">
             <Link
               href="/takeaways/community"

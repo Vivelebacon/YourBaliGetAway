@@ -1,6 +1,7 @@
 // Ready-made article scaffolds for the Takeaways CMS. Joel picks one when
-// creating an article: it pre-fills the category and a structured body with
-// headings and prompts, so he only has to fill in the blanks.
+// creating an article (or switches the category in the editor): it pre-fills a
+// structured body with headings and prompts, so he only fills in the blanks.
+// One template per category, so changing the category swaps the template.
 // Client-safe: no server-only imports.
 
 export interface ArticleTemplate {
@@ -15,6 +16,19 @@ export interface ArticleTemplate {
 
 export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
   {
+    id: 'joel',
+    label: "Joel's special",
+    category: 'joel',
+    hint: 'A personal pick or a perfect day, in your own voice.',
+    excerpt: 'A personal recommendation from your host, tried and tested.',
+    body: `<p><em>Tell it in your own voice: what is this, and why do you love it?</em></p>
+<h2>The story</h2>
+<p><em>How you found it, or how you'd spend the day.</em></p>
+<h2>What to do</h2>
+<p><em>The specifics: where, when, what to order or ask for.</em></p>`,
+    joelPicks: `<p><em>Members only: the detail you'd only tell a friend.</em></p>`,
+  },
+  {
     id: 'restaurants',
     label: 'Restaurants / where to eat',
     category: 'food',
@@ -28,6 +42,21 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
 <h2>For a casual bite</h2>
 <p><em>A warung or local spot worth knowing, and what to try there.</em></p>`,
     joelPicks: `<p><em>The insider bit (members only): the exact table to ask for, the best time to arrive, and the one dish most people miss.</em></p>`,
+  },
+  {
+    id: 'bars',
+    label: 'Bars / drinks / nightlife',
+    category: 'bars',
+    hint: 'Where to go for a drink, sunset cocktail or a night out.',
+    excerpt: 'From a quiet sunset cocktail to a proper night out, here is where to go for a drink nearby.',
+    body: `<p><em>Set the scene: what is the drinks and nightlife scene like here?</em></p>
+<h2>For a sunset drink</h2>
+<p><strong>[Bar / beach club]</strong> — <em>the vibe, what to order, and when to arrive for the best spot.</em></p>
+<h2>For cocktails</h2>
+<ul><li><strong>[Bar]</strong>: <em>one line on why.</em></li><li><strong>[Bar]</strong>: <em>one line on why.</em></li></ul>
+<h2>For a night out</h2>
+<p><em>Where the night goes late, and what to expect.</em></p>`,
+    joelPicks: `<p><em>Members only: the bar locals actually go to, and the drink to order there.</em></p>`,
   },
   {
     id: 'wellness',
@@ -60,10 +89,25 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
     joelPicks: `<p><em>Members only: your secret sunset spot and the exact time to be there.</em></p>`,
   },
   {
+    id: 'activities',
+    label: 'Activities / things to do',
+    category: 'activities',
+    hint: 'Surf lessons, classes, water sports, entertainment.',
+    excerpt: 'Beyond the beach and the pool: the activities worth booking during your stay.',
+    body: `<p><em>What kind of activities can guests do around here?</em></p>
+<h2>On the water</h2>
+<p><strong>[Activity]</strong> — <em>surf lessons, snorkelling, water sports: where to book and what to expect.</em></p>
+<h2>Classes and culture</h2>
+<ul><li><strong>[Activity]</strong>: <em>cooking class, yoga, craft: one line on why.</em></li></ul>
+<h2>For the evening</h2>
+<p><em>Shows, live music or entertainment worth catching.</em></p>`,
+    joelPicks: `<p><em>Members only: the activity guests rave about, and how to book it for the best price.</em></p>`,
+  },
+  {
     id: 'daytrip',
-    label: 'Day trip / things to do',
+    label: 'Day trip / excursions',
     category: 'explore',
-    hint: 'A destination or activity within reach of the villa.',
+    hint: 'A destination within reach of the villa: Ubud, Uluwatu, temples.',
     excerpt: 'You do not need to move hotels to see the famous Bali. Here is a day trip worth planning.',
     body: `<p><em>What is this place, and why is it worth a day?</em></p>
 <h2>What to see</h2>
@@ -73,19 +117,6 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
 <h2>Getting there</h2>
 <p><em>How to arrange a driver, roughly what it costs, and how to book through you.</em></p>`,
     joelPicks: `<p><em>Members only: the smarter way to do this trip that avoids the crowds and the traffic.</em></p>`,
-  },
-  {
-    id: 'joel',
-    label: "Joel's special",
-    category: 'joel',
-    hint: 'A personal pick or a perfect day, in your own voice.',
-    excerpt: 'A personal recommendation from your host, tried and tested.',
-    body: `<p><em>Tell it in your own voice: what is this, and why do you love it?</em></p>
-<h2>The story</h2>
-<p><em>How you found it, or how you'd spend the day.</em></p>
-<h2>What to do</h2>
-<p><em>The specifics: where, when, what to order or ask for.</em></p>`,
-    joelPicks: `<p><em>Members only: the detail you'd only tell a friend.</em></p>`,
   },
   {
     id: 'practical',
@@ -104,8 +135,8 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
   },
   {
     id: 'blank',
-    label: 'Blank article',
-    category: 'explore',
+    label: 'Blank / other',
+    category: 'other',
     hint: 'Start from an empty page.',
     excerpt: '',
     body: '',
@@ -115,4 +146,12 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
 
 export function getTemplate(id: string): ArticleTemplate {
   return ARTICLE_TEMPLATES.find((t) => t.id === id) ?? ARTICLE_TEMPLATES[ARTICLE_TEMPLATES.length - 1]
+}
+
+// One template per category, used by the editor when Joel switches the category.
+export function templateForCategory(category: string): ArticleTemplate {
+  return (
+    ARTICLE_TEMPLATES.find((t) => t.category === category) ??
+    ARTICLE_TEMPLATES[ARTICLE_TEMPLATES.length - 1]
+  )
 }

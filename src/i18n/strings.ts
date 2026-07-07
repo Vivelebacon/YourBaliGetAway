@@ -189,6 +189,8 @@ export const UI_STRINGS: string[] = [
   'Reply',
   'Delete',
   'No recommendations yet. Be the first to share one!',
+  'A members-only community',
+  'Create a free account to see and share Bali recommendations from fellow guests.',
   'Recommendations coming soon',
   'Our hosts are writing up their favourite Bali spots. Check back very soon, or share your own below.',
   'Load more',
