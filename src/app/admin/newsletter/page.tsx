@@ -1,18 +1,26 @@
 import { createClient } from '@/lib/supabase/server'
 import CopyEmailsButton from '@/components/admin/CopyEmailsButton'
+import NewsletterComposer, { type NewsletterDraft } from '@/components/admin/NewsletterComposer'
 
 export const dynamic = 'force-dynamic'
 
 export default async function AdminNewsletter() {
   // Admin session: RLS "read own profile or admin" exposes all member rows.
   const supabase = await createClient()
-  const { data } = await supabase
-    .from('profiles')
-    .select('email,display_name,newsletter_opt_in,created_at')
-    .eq('role', 'member')
-    .order('created_at', { ascending: false })
+  const [{ data: memberData }, { data: draftData }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('email,display_name,newsletter_opt_in,created_at')
+      .eq('role', 'member')
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('newsletters')
+      .select('id,subject,body,status,recipient_count,sent_at,created_at')
+      .order('created_at', { ascending: false })
+      .limit(20),
+  ])
 
-  const members = data ?? []
+  const members = memberData ?? []
   const subscribers = members.filter((m) => m.newsletter_opt_in && m.email)
   const emails = subscribers.map((s) => s.email as string)
 
@@ -20,7 +28,7 @@ export default async function AdminNewsletter() {
     <div>
       <h1 className="font-serif text-3xl text-villa-dark mb-2">Newsletter</h1>
       <p className="text-stone-500 mb-8">
-        Members who ticked the newsletter box at signup. Copy the list into BCC for the monthly Bali tips email.
+        Write your monthly Bali tips here and send them to members who opted in, straight from your own email.
       </p>
 
       <div className="mb-8 flex flex-wrap items-center gap-6 rounded-2xl bg-white p-6 shadow-sm">
@@ -36,6 +44,8 @@ export default async function AdminNewsletter() {
           <CopyEmailsButton emails={emails} />
         </div>
       </div>
+
+      <NewsletterComposer emails={emails} initialDrafts={(draftData ?? []) as NewsletterDraft[]} />
 
       <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
         <table className="w-full text-left text-sm">

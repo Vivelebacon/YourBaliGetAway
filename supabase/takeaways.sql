@@ -147,6 +147,24 @@ drop policy if exists "authors delete own comments" on public.takeaway_rec_comme
 create policy "authors delete own comments" on public.takeaway_rec_comments for delete to authenticated
   using (user_id = auth.uid() or public.is_admin());
 
+-- 4b) Newsletter drafts + sent history, composed by Joel in the CMS.
+create table if not exists public.newsletters (
+  id              uuid primary key default gen_random_uuid(),
+  subject         text not null,
+  body            text not null default '',
+  status          text not null default 'draft',   -- 'draft' | 'sent'
+  recipient_count int  not null default 0,
+  sent_at         timestamptz,
+  created_by      uuid references auth.users(id) on delete set null,
+  created_at      timestamptz default now(),
+  updated_at      timestamptz default now()
+);
+create index if not exists newsletters_recent_idx on public.newsletters(created_at desc);
+alter table public.newsletters enable row level security;
+drop policy if exists "admin all newsletters" on public.newsletters;
+create policy "admin all newsletters" on public.newsletters for all
+  using (public.is_admin()) with check (public.is_admin());
+
 -- 5) Members-only column: anon API callers can never read joel_picks.
 revoke select (joel_picks) on public.takeaway_articles from anon;
 
