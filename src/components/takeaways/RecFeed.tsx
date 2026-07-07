@@ -314,11 +314,15 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
   const [placeName, setPlaceName] = useState('')
   const [area, setArea] = useState('')
   const [category, setCategory] = useState('food')
+  const [customCategory, setCustomCategory] = useState('')
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState<'ok' | 'err' | null>(null)
 
   async function submit() {
     if (!user || !title.trim() || !body.trim() || busy) return
+    // "Other" lets the member name their own category; store that free text.
+    const finalCategory =
+      category === 'other' && customCategory.trim() ? customCategory.trim().slice(0, 40) : category
     setBusy(true)
     setMsg(null)
     const { data, error } = await supabase
@@ -326,7 +330,7 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
       .insert({
         user_id: user.id,
         author_name: displayName || 'Guest',
-        category,
+        category: finalCategory,
         title: title.trim(),
         body: body.trim(),
         place_name: placeName.trim() || null,
@@ -344,6 +348,7 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
     setBody('')
     setPlaceName('')
     setArea('')
+    setCustomCategory('')
     onPosted({
       id: data.id as string,
       authorName: data.author_name as string,
@@ -390,7 +395,7 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
           maxLength={60}
           className="rounded-xl border border-stone-200 px-4 py-2.5 text-sm outline-none focus:border-villa-green"
         />
-        <div className="flex items-center gap-3 md:col-span-2">
+        <div className="flex flex-wrap items-center gap-3 md:col-span-2">
           <label className="text-sm text-villa-muted">{t('Category')}</label>
           <select
             value={category}
@@ -403,9 +408,18 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
               </option>
             ))}
           </select>
+          {category === 'other' && (
+            <input
+              value={customCategory}
+              onChange={(e) => setCustomCategory(e.target.value)}
+              placeholder={t('Your own category')}
+              maxLength={40}
+              className="min-w-[10rem] flex-1 rounded-xl border border-stone-200 px-3 py-2 text-sm outline-none focus:border-villa-green"
+            />
+          )}
           <button
             onClick={submit}
-            disabled={busy || !title.trim() || !body.trim()}
+            disabled={busy || !title.trim() || !body.trim() || (category === 'other' && !customCategory.trim())}
             className="ml-auto rounded-full bg-villa-green px-7 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light disabled:cursor-not-allowed disabled:opacity-50"
           >
             {busy ? t('Posting…') : t('Post recommendation')}

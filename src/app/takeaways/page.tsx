@@ -67,14 +67,16 @@ export default async function TakeawaysPage() {
       {/* ── Category chips ── */}
       <section data-nav-light-bg className="px-6 pt-16">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-2">
-          {TAKEAWAY_CATEGORIES.map((c, i) => (
-            <span
-              key={c.slug}
-              className="rounded-full border border-villa-green/25 bg-white px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-villa-green"
-            >
-              {catLabels[i] ?? c.label}
-            </span>
-          ))}
+          {TAKEAWAY_CATEGORIES.map((c, i) =>
+            c.slug === 'other' ? null : (
+              <span
+                key={c.slug}
+                className="rounded-full border border-villa-green/25 bg-white px-4 py-1.5 text-xs uppercase tracking-[0.14em] text-villa-green"
+              >
+                {catLabels[i] ?? c.label}
+              </span>
+            ),
+          )}
         </div>
       </section>
 
