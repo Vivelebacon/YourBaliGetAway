@@ -7,11 +7,13 @@ export default function ArticleCard({
   article,
   categoryLabel,
   readLabel,
+  membersLabel = 'Members',
   large = false,
 }: {
   article: TakeawayArticleCard
   categoryLabel: string
   readLabel: string
+  membersLabel?: string
   large?: boolean
 }) {
   return (
@@ -33,6 +35,11 @@ export default function ArticleCard({
         <span className="absolute left-4 top-4 rounded-full border border-white/30 bg-black/30 px-3 py-1 text-xs uppercase tracking-[0.18em] text-white backdrop-blur-sm">
           {categoryLabel}
         </span>
+        {article.membersOnly && (
+          <span className="absolute right-4 top-4 flex items-center gap-1 rounded-full border border-villa-gold/50 bg-black/40 px-3 py-1 text-xs font-medium tracking-wide text-villa-gold backdrop-blur-sm">
+            🔒 {membersLabel}
+          </span>
+        )}
       </div>
       <div className="flex flex-1 flex-col p-6">
         <h3 className={`font-serif text-villa-dark transition-colors duration-300 group-hover:text-villa-green ${large ? 'text-3xl' : 'text-2xl'}`}>

@@ -29,7 +29,6 @@ function JoinForm() {
   const [newsletter, setNewsletter] = useState(false)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [confirmSent, setConfirmSent] = useState(false)
 
   const next = params.get('next') || '/takeaways/community'
 
@@ -40,27 +39,32 @@ function JoinForm() {
     setError(null)
 
     if (mode === 'signup') {
-      const { data, error } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: {
-          data: { display_name: name.trim() || email.split('@')[0], newsletter_opt_in: newsletter },
-          emailRedirectTo: `${window.location.origin}${next}`,
-        },
+      // Create the (already-confirmed) member via the server route, then sign in.
+      const res = await fetch('/api/takeaways/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: email.trim(),
+          password,
+          displayName: name.trim(),
+          newsletter,
+        }),
       })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok) {
+        setBusy(false)
+        setError(json.error || 'Could not create your account. Please try again.')
+        if (res.status === 409) setMode('signin')
+        return
+      }
+      const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       setBusy(false)
       if (error) {
         setError(error.message)
         return
       }
-      // Depending on the project's auth settings, signup may require email
-      // confirmation (no session yet) or sign the user straight in.
-      if (data.session) {
-        router.push(next)
-        router.refresh()
-      } else {
-        setConfirmSent(true)
-      }
+      router.push(next)
+      router.refresh()
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email: email.trim(), password })
       setBusy(false)
@@ -83,12 +87,7 @@ function JoinForm() {
         {t('One account for recommendations, likes and insider picks.')}
       </p>
 
-      {confirmSent ? (
-        <div className="mt-8 rounded-2xl bg-villa-green/10 p-5 text-sm leading-relaxed text-villa-green">
-          {t('Check your inbox to confirm your email, then sign in.')}
-        </div>
-      ) : (
-        <form onSubmit={submit} className="mt-7 space-y-4">
+      <form onSubmit={submit} className="mt-7 space-y-4">
           {mode === 'signup' && (
             <input
               value={name}
@@ -136,21 +135,18 @@ function JoinForm() {
             className="w-full rounded-full bg-villa-green py-3 text-sm font-medium text-white transition-colors hover:bg-villa-green-light disabled:opacity-60"
           >
             {mode === 'signup' ? (busy ? t('Creating…') : t('Create account')) : busy ? t('Signing in…') : t('Sign in')}
-          </button>
-        </form>
-      )}
-
-      {!confirmSent && (
-        <button
-          onClick={() => {
-            setMode(mode === 'signup' ? 'signin' : 'signup')
-            setError(null)
-          }}
-          className="mt-5 w-full text-center text-sm font-medium text-villa-green hover:underline"
-        >
-          {mode === 'signup' ? t('Already a member? Sign in') : t('New here? Create a free account')}
         </button>
-      )}
+      </form>
+
+      <button
+        onClick={() => {
+          setMode(mode === 'signup' ? 'signin' : 'signup')
+          setError(null)
+        }}
+        className="mt-5 w-full text-center text-sm font-medium text-villa-green hover:underline"
+      >
+        {mode === 'signup' ? t('Already a member? Sign in') : t('New here? Create a free account')}
+      </button>
     </div>
   )
 }

@@ -11,6 +11,7 @@ import RecFeed from '@/components/takeaways/RecFeed'
 import { getArticleBySlug, getArticlesList, categoryLabel } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
+import { createClient } from '@/lib/supabase/server'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
 
 interface Props {
@@ -48,6 +49,15 @@ export default async function TakeawayArticlePage({ params }: Props) {
 
   const [messages, all] = await Promise.all([getMessages(locale), getArticlesList(locale)])
   const t = (s: string) => messages[s] ?? s
+
+  // Members-only articles: hide the body from non-logged-in visitors (checked
+  // server-side, so the body is never sent in the HTML for anon).
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  const locked = article.membersOnly && !user
+
   const related = all.filter((a) => a.slug !== slug && a.category === article.category).slice(0, 3)
   const fallbackRelated = related.length > 0 ? related : all.filter((a) => a.slug !== slug).slice(0, 3)
 
@@ -100,15 +110,50 @@ export default async function TakeawayArticlePage({ params }: Props) {
       <article data-nav-light-bg className="px-6 py-14">
         <div className="mx-auto max-w-3xl">
           <p className="font-serif text-xl italic leading-relaxed text-villa-green">{article.excerpt}</p>
-          <div
-            className="prose prose-stone mt-8 max-w-none prose-headings:font-serif prose-headings:font-light prose-headings:text-villa-dark prose-p:leading-relaxed prose-strong:text-villa-dark"
-            dangerouslySetInnerHTML={{ __html: article.body }}
-          />
 
-          {/* Members-only: Joel's insider picks (gated at the DB level) */}
-          <JoelPicks slug={article.slug} hasPicks={article.hasJoelPicks} />
+          {locked ? (
+            // Members-only article, visitor not logged in: teaser + join gate.
+            <div className="relative mt-8">
+              <div className="pointer-events-none max-h-40 overflow-hidden [mask-image:linear-gradient(to_bottom,black,transparent)]">
+                <div
+                  className="prose prose-stone max-w-none prose-headings:font-serif prose-p:leading-relaxed"
+                  dangerouslySetInnerHTML={{ __html: article.body.slice(0, 400) }}
+                />
+              </div>
+              <div className="mt-6 rounded-2xl border border-villa-gold/40 bg-gradient-to-br from-[#fdf8ee] to-[#f7efdd] p-8 text-center">
+                <p className="text-xs uppercase tracking-[0.35em] text-villa-gold">{t('Members only')}</p>
+                <h2 className="mt-2 font-serif text-2xl font-light text-villa-dark">
+                  {t('This guide is for members')}
+                </h2>
+                <p className="mx-auto mt-2 max-w-md text-sm text-villa-muted">
+                  {t('Create a free account to read the full guide and unlock the insider picks.')}
+                </p>
+                <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+                  <Link
+                    href="/takeaways/join"
+                    className="rounded-full bg-villa-green px-7 py-2.5 text-sm font-medium text-white transition-colors hover:bg-villa-green-light"
+                  >
+                    {t('Create a free account')}
+                  </Link>
+                  <Link href="/takeaways/join?mode=signin" className="text-sm font-medium text-villa-green hover:underline">
+                    {t('Sign in')}
+                  </Link>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              <div
+                className="prose prose-stone mt-8 max-w-none prose-headings:font-serif prose-headings:font-light prose-headings:text-villa-dark prose-p:leading-relaxed prose-strong:text-villa-dark"
+                dangerouslySetInnerHTML={{ __html: article.body }}
+              />
 
-          <Link href="/takeaways" className="inline-flex items-center gap-2 text-sm font-medium text-villa-green hover:underline">
+              {/* Members-only: Joel's insider picks (gated at the DB level) */}
+              <JoelPicks slug={article.slug} hasPicks={article.hasJoelPicks} />
+            </>
+          )}
+
+          <Link href="/takeaways" className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-villa-green hover:underline">
             <span aria-hidden="true">←</span> {t('Back to the guide')}
           </Link>
         </div>
@@ -150,6 +195,7 @@ export default async function TakeawayArticlePage({ params }: Props) {
                   article={a}
                   categoryLabel={t(categoryLabel(a.category))}
                   readLabel={t('Read article')}
+                        membersLabel={t('Members')}
                 />
               ))}
             </div>

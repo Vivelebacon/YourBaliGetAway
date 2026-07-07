@@ -24,6 +24,7 @@ export interface ArticleRow {
   joel_picks: string | null
   featured: boolean
   published: boolean
+  members_only: boolean
   sort_order: number
 }
 
@@ -51,6 +52,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
   const [picks, setPicks] = useState(initial.joel_picks ?? '')
   const [featured, setFeatured] = useState(initial.featured)
   const [published, setPublished] = useState(initial.published)
+  const [membersOnly, setMembersOnly] = useState(initial.members_only)
   const [sortOrder, setSortOrder] = useState(initial.sort_order)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -95,6 +97,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
         joel_picks: picks || null,
         featured,
         published,
+        members_only: membersOnly,
         sort_order: sortOrder,
         updated_at: new Date().toISOString(),
       })
@@ -202,11 +205,41 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
               <input type="checkbox" checked={published} onChange={(e) => setPublished(e.target.checked)} className="h-4 w-4 accent-[#3d5a3e]" />
               Published
             </label>
-            <label className="flex cursor-pointer items-center gap-2 text-sm text-stone-700">
+            <label className="flex cursor-pointer items-center gap-2 text-sm text-stone-700" title="Shows larger, at the top of the guide">
               <input type="checkbox" checked={featured} onChange={(e) => setFeatured(e.target.checked)} className="h-4 w-4 accent-[#3d5a3e]" />
               Featured
             </label>
           </div>
+        </div>
+
+        {/* Visibility: public vs members-only */}
+        <div>
+          <label className="mb-2 block text-sm font-medium text-stone-700">Who can read this article?</label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              type="button"
+              onClick={() => setMembersOnly(false)}
+              className={`rounded-xl border p-4 text-left transition ${
+                !membersOnly ? 'border-villa-green bg-villa-green/5 ring-1 ring-villa-green' : 'border-stone-200 hover:border-stone-300'
+              }`}
+            >
+              <p className="text-sm font-medium text-villa-dark">🌍 Public</p>
+              <p className="mt-1 text-xs text-stone-500">Anyone can read it. Best for SEO: it shows up on Google.</p>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMembersOnly(true)}
+              className={`rounded-xl border p-4 text-left transition ${
+                membersOnly ? 'border-villa-green bg-villa-green/5 ring-1 ring-villa-green' : 'border-stone-200 hover:border-stone-300'
+              }`}
+            >
+              <p className="text-sm font-medium text-villa-dark">🔒 Members only</p>
+              <p className="mt-1 text-xs text-stone-500">Only people with a free account can read it. Others see a teaser and a sign-up prompt.</p>
+            </button>
+          </div>
+          <p className="mt-2 text-xs text-stone-400">
+            &ldquo;Featured&rdquo; is different: it only makes an article show larger at the top of the guide. It does not make it private.
+          </p>
         </div>
 
         <div>

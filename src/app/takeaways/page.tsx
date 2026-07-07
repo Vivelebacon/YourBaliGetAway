@@ -95,6 +95,7 @@ export default async function TakeawaysPage() {
                         article={a}
                         categoryLabel={t(categoryLabel(a.category))}
                         readLabel={t('Read article')}
+                        membersLabel={t('Members')}
                         large
                       />
                     </Reveal>
@@ -114,6 +115,7 @@ export default async function TakeawaysPage() {
                       article={a}
                       categoryLabel={t(categoryLabel(a.category))}
                       readLabel={t('Read article')}
+                        membersLabel={t('Members')}
                     />
                   </Reveal>
                 ))}
