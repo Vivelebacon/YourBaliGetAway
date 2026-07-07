@@ -71,6 +71,20 @@ export default async function VillaPage({ params }: Props) {
         </div>
       </section>
 
+      {/* ── Booking Widget ── */}
+      <section id="book" data-nav-light-bg className="py-20 px-6">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('Direct Booking')}</p>
+            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">{t('Reserve {villa}').replace('{villa}', villa.name)}</h2>
+            <p className="text-stone-500 text-sm">{t('Real-time availability. Send a request and your host confirms. Best rate guaranteed.')}</p>
+          </div>
+          {listingId && (
+            <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
+          )}
+        </div>
+      </section>
+
       {/* ── Stats + Description ── */}
       <section data-nav-light-bg className="py-16 px-6">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
@@ -109,20 +123,6 @@ export default async function VillaPage({ params }: Props) {
               ))}
             </ul>
           </div>
-        </div>
-      </section>
-
-      {/* ── Booking Widget ── */}
-      <section id="book" data-nav-light-bg className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-villa-gold text-sm tracking-[0.3em] uppercase mb-3">{t('Direct Booking')}</p>
-            <h2 className="font-serif text-4xl text-villa-dark font-light mb-3">{t('Reserve {villa}').replace('{villa}', villa.name)}</h2>
-            <p className="text-stone-500 text-sm">{t('Real-time availability. Send a request and your host confirms. Best rate guaranteed.')}</p>
-          </div>
-          {listingId && (
-            <BookingCalendar listingId={listingId} villaName={villa.name} maxGuests={villa.guests} />
-          )}
         </div>
       </section>
 
