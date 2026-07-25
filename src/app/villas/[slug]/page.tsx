@@ -10,6 +10,14 @@ import { getHostawayListingId } from '@/lib/villas'
 import { getVillaBySlug, getVillaSlugs, getVillasList } from '@/lib/content'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
+import { SITE_NAME } from '@/lib/site'
+import {
+  villaTitle,
+  villaDescription,
+  villaCanonical,
+  villaOgImage,
+  villaJsonLd,
+} from '@/lib/seo'
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -24,9 +32,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const villa = await getVillaBySlug(slug)
   if (!villa) return {}
+
+  // Search copy is curated per villa: the CMS subtitle is a full sentence and
+  // the description is rich text, neither of which belongs in <title>/<meta>.
+  const title = villaTitle(slug, villa)
+  const description = villaDescription(slug, villa)
+  const url = villaCanonical(slug)
+  const ogImage = villaOgImage(slug)
+
   return {
-    title: `${villa.name} — ${villa.subtitle} | YBG Villas`,
-    description: villa.description.slice(0, 160),
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'website',
+      siteName: SITE_NAME,
+      url,
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `${villa.name}, a private pool villa in Seminyak, Bali`,
+        },
+      ],
+    },
+    twitter: { card: 'summary_large_image', title, description, images: [ogImage] },
   }
 }
 
@@ -47,6 +80,11 @@ export default async function VillaPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-villa-cream">
+      {/* Lodging entity: rating, address, amenities. Renders no UI. */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(villaJsonLd(slug, villa)) }}
+      />
       <Navbar />
 
       {/* ── Hero ── */}
@@ -188,7 +226,7 @@ export default async function VillaPage({ params }: Props) {
       </section>
 
       <div className="text-center py-8">
-        <Link href="/" className="text-villa-muted text-sm hover:text-villa-green transition-colors">← {t('Back to all villas')}</Link>
+        <Link href="/villas" className="text-villa-muted text-sm hover:text-villa-green transition-colors">← {t('Back to all villas')}</Link>
       </div>
 
       <Footer />

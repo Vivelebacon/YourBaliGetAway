@@ -5,15 +5,25 @@ import Footer from '@/components/Footer'
 import RecFeed from '@/components/takeaways/RecFeed'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
-import { SITE_URL } from '@/lib/site'
+import { SITE_URL, SITE_NAME } from '@/lib/site'
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'The Community Wall | Our Bali Takeaways',
+  title: 'The Community Wall: Bali Tips from Guests | YBG Villas',
   description:
     'Real Bali tips from guests, for guests: restaurants, massages, beaches and hidden gems recommended by travellers who stayed at Your Bali Getaway.',
   alternates: { canonical: `${SITE_URL}/takeaways/community` },
+  // Own Open Graph card: without this the page inherits the homepage villa card.
+  openGraph: {
+    type: 'website',
+    siteName: SITE_NAME,
+    url: `${SITE_URL}/takeaways/community`,
+    title: 'The Community Wall: Bali Tips from Guests | YBG Villas',
+    description:
+      'Real Bali tips from guests, for guests: restaurants, massages, beaches and hidden gems recommended by travellers who stayed at Your Bali Getaway.',
+    images: ['/takeaways/hero-poster.jpg'],
+  },
 }
 
 export default async function CommunityPage() {

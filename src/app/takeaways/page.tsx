@@ -12,9 +12,9 @@ import { getMessages, translateTexts } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
 
 export const metadata: Metadata = {
-  title: 'Our Bali Takeaways | The Insider Bali Guide by Your Bali Getaway',
+  title: 'Our Bali Takeaways: The Insider Bali Guide | YBG Villas',
   description:
-    'The insider guide to Bali by your hosts and fellow guests: the best restaurants in Seminyak, massages, beaches, day trips and the exact tips locals give their friends.',
+    'The insider guide to Bali by your hosts and fellow guests: the best restaurants in Seminyak, massages, beaches, day trips and the tips locals really give.',
   alternates: { canonical: `${SITE_URL}/takeaways` },
   openGraph: {
     title: 'Our Bali Takeaways | The Insider Bali Guide',
