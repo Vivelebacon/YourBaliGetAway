@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   title: 'Luxury Private Pool Villas in Bali | Your Bali Getaway',
   description:
     'Book one of five private pool villas in Bali direct with the host. No platform fees, best rates, and instant WhatsApp confirmation for your luxury Bali stay.',
+  verification: { google: 'sR2l19y63yScbBUakk0fqnWdD4PhfmawGan6-dfo4Y0' },
   openGraph: {
     type: 'website',
     siteName: SITE_NAME,
