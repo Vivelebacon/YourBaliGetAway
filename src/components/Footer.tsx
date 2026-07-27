@@ -17,6 +17,9 @@ export default function Footer() {
             <Link href="/about" className="text-stone-300 hover:text-villa-gold transition-colors">
               {t('Meet your hosts')} →
             </Link>
+            <Link href="/reviews" className="text-stone-300 hover:text-villa-gold transition-colors">
+              {t('Guest reviews')} →
+            </Link>
             <Link href="/faq" className="text-stone-300 hover:text-villa-gold transition-colors">
               {t('FAQ')} →
             </Link>

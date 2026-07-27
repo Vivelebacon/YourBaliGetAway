@@ -131,6 +131,47 @@ export async function getVillaSlugs(): Promise<string[]> {
   return (data ?? []).map((v) => (v as { slug: string }).slug)
 }
 
+export interface VillaReviewsGroup {
+  slug: string
+  name: string
+  rating: number
+  reviewCount: number
+  reviews: { name: string; text: string }[]
+}
+
+// All villas with their curated guest reviews, in one query. Used by /reviews.
+export async function getAllVillaReviews(locale = 'en'): Promise<VillaReviewsGroup[]> {
+  const { data, error } = await supabase
+    .from('villas')
+    .select('slug,name,rating,review_count,reviews(name,text,sort_order)')
+    .order('sort_order', { ascending: true })
+  if (error || !data) return []
+
+  const groups: VillaReviewsGroup[] = (
+    data as (VillaRow & { reviews: { name: string; text: string; sort_order: number }[] })[]
+  ).map((r) => ({
+    slug: r.slug,
+    name: r.name,
+    rating: r.rating ?? 0,
+    reviewCount: r.review_count,
+    reviews: [...(r.reviews ?? [])]
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((x) => ({ name: x.name, text: x.text })),
+  }))
+
+  if (locale === 'en') return groups
+
+  // Localize review text only (guest names and villa names stay as-is).
+  const src: string[] = []
+  for (const g of groups) for (const rv of g.reviews) src.push(rv.text)
+  const tr = await translateTexts(src, locale)
+  let k = 0
+  return groups.map((g) => ({
+    ...g,
+    reviews: g.reviews.map((rv) => ({ ...rv, text: tr[k++] ?? rv.text })),
+  }))
+}
+
 export async function getVillaBySlug(slug: string, locale = 'en'): Promise<VillaDetail | null> {
   const { data, error } = await supabase
     .from('villas')
