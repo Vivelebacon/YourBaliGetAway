@@ -3,6 +3,7 @@ import './globals.css'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
 import { LanguageProvider } from '@/components/LanguageProvider'
 import ChatWidget from '@/components/ChatWidget'
+import { Analytics } from '@vercel/analytics/next'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
@@ -51,6 +52,8 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <CurrencyProvider>{children}</CurrencyProvider>
           <ChatWidget />
         </LanguageProvider>
+        {/* Vercel Web Analytics — cookieless, privacy-friendly (no consent banner needed). */}
+        <Analytics />
       </body>
     </html>
   )
