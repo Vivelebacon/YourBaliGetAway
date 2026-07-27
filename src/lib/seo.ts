@@ -73,26 +73,31 @@ const VILLA_SEO: Record<string, VillaSeoCopy> = {
     title: 'Bali Bliss: 2-Bed Private Pool Villa Seminyak | YBG Villas',
     description:
       'A cheerful 2-bedroom private pool villa in Seminyak, a 10-minute walk from the beach. Book direct with your host: no platform fees, best rate guaranteed.',
+    geo: { latitude: -8.68639942, longitude: 115.16202774 },
   },
   'bali-blue-1': {
     title: 'Bali Blue 1: 2-Bed Pool Villa near Eat Street | YBG Villas',
     description:
       'Peaceful 2-bedroom pool villa with a master suite and bathtub, steps from Kayu Aya Eat Street. Book direct: no platform fees and instant confirmation.',
+    geo: { latitude: -8.68646431, longitude: 115.16239166 },
   },
   'bali-blue-2': {
     title: 'Bali Blue 2: 2-Bed Pool Villa, Seminyak Bali | YBG Villas',
     description:
       'Relaxed 2-bedroom private pool villa with a lush tropical garden in central Seminyak. Book direct with your host for the best rate and an instant reply.',
+    geo: { latitude: -8.68640614, longitude: 115.16242981 },
   },
   'bali-green': {
     title: 'Bali Green: 4-Bed Pool Villa, Seminyak Bali | YBG Villas',
     description:
       'Spacious 4-bedroom private pool villa near Double Six Beach, ideal for groups and families. Book direct: no platform fees, best rate guaranteed.',
+    geo: { latitude: -8.697681, longitude: 115.169723 },
   },
   'bali-sol': {
     title: 'Bali Sol: 2-Bed Seminyak Pool Villa + Cinema | YBG Villas',
     description:
       'Exceptionally spacious 2-bedroom Seminyak villa with a private pool and home cinema. Book direct with your host: no fees and instant WhatsApp reply.',
+    geo: { latitude: -8.68387318, longitude: 115.16553215 },
   },
 }
 
