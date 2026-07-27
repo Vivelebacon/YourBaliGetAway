@@ -13,6 +13,9 @@ export default function Footer() {
           <p className="text-sm leading-relaxed text-stone-400">
             {t('Five private pool villas in the heart of Bali. Book direct for the best rates and personalised service.')}
           </p>
+          <Link href="/about" className="mt-4 inline-block text-sm text-stone-300 hover:text-villa-gold transition-colors">
+            {t('Meet your hosts')} →
+          </Link>
         </div>
 
         <div>
