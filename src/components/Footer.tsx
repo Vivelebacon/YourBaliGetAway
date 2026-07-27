@@ -14,6 +14,9 @@ export default function Footer() {
             {t('Five private pool villas in the heart of Bali. Book direct for the best rates and personalised service.')}
           </p>
           <div className="mt-4 flex flex-col gap-2 text-sm">
+            <Link href="/book-direct" className="text-stone-300 hover:text-villa-gold transition-colors">
+              {t('Why book direct')} →
+            </Link>
             <Link href="/about" className="text-stone-300 hover:text-villa-gold transition-colors">
               {t('Meet your hosts')} →
             </Link>
