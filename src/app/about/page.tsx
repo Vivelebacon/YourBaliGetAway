@@ -16,7 +16,7 @@ import Footer from '@/components/Footer'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { SITE_URL, SITE_NAME } from '@/lib/site'
-import { ORGANIZATION_ID, WEBSITE_ID } from '@/lib/seo'
+import { absoluteUrl, ORGANIZATION_ID, WEBSITE_ID } from '@/lib/seo'
 
 const TITLE = 'Meet Your Hosts: Joel & Dewa, Seminyak | YBG Villas'
 const DESCRIPTION =
@@ -39,12 +39,13 @@ export const metadata: Metadata = {
 
 // Hosts. Photos: swap `avatar` initials for a real image once available
 // (drop a photo in the villa-images bucket and reference it here).
-const HOSTS = [
+const HOSTS: { initial: string; name: string; role: string; bio: string; photo?: string }[] = [
   {
     initial: 'J',
     name: 'Joel',
     role: 'Owner & Host',
-    bio: 'Joel is the owner of Your Bali Getaway. He looks after the villas with the care of someone hosting guests in his own home, and he is the reason bookings run direct: better rates for you, and a personal relationship instead of a platform in the middle.',
+    photo: '/about/joel.jpg',
+    bio: 'Joel is the owner of Your Bali Getaway. He looks after the villas with the care of someone hosting guests in his own home, and he is the reason bookings run direct: better rates for you, and a personal relationship instead of a platform in the middle. From your first message to your last morning, you are dealing with the host, not a booking desk.',
   },
   {
     initial: 'D',
@@ -72,6 +73,7 @@ export default async function AboutPage() {
       name: h.name,
       jobTitle: h.role,
       worksFor: { '@id': ORGANIZATION_ID },
+      ...(h.photo ? { image: absoluteUrl(h.photo) } : {}),
     })),
   }
 
@@ -135,10 +137,20 @@ export default async function AboutPage() {
             {HOSTS.map((h) => (
               <div key={h.name} className="rounded-2xl bg-villa-cream p-8 shadow-sm">
                 <div className="mb-5 flex items-center gap-4">
-                  {/* Placeholder avatar — swap for a real host photo when available */}
-                  <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-villa-green font-serif text-2xl text-white">
-                    {h.initial}
-                  </div>
+                  {h.photo ? (
+                    <Image
+                      src={h.photo}
+                      alt={`${h.name}, ${h.role} at Your Bali Getaway`}
+                      width={64}
+                      height={64}
+                      className="h-16 w-16 flex-shrink-0 rounded-full object-cover"
+                    />
+                  ) : (
+                    // Initial avatar — swap for a real host photo when available
+                    <div className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full bg-villa-green font-serif text-2xl text-white">
+                      {h.initial}
+                    </div>
+                  )}
                   <div>
                     <h3 className="font-serif text-2xl text-villa-dark">{t(h.name)}</h3>
                     <p className="text-sm uppercase tracking-[0.18em] text-villa-gold">{t(h.role)}</p>
