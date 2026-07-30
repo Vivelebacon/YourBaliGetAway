@@ -33,6 +33,7 @@ export interface TakeawayArticleCard {
 }
 
 export interface TakeawayArticle extends TakeawayArticleCard {
+  subtitle: string
   body: string
   hasJoelPicks: boolean
   createdAt: string
@@ -95,23 +96,38 @@ export async function getArticleBySlug(slug: string, locale = 'en'): Promise<Tak
   // Joel's picks block exists without exposing the gated content to anon.
   const { data, error } = await supabase
     .from('takeaway_articles')
-    .select(`${CARD_COLS},body,created_at,has_picks`)
+    .select(`${CARD_COLS},subtitle,body,created_at,has_picks`)
     .eq('published', true)
     .eq('slug', slug)
     .maybeSingle()
   if (error || !data) return null
-  const row = data as ArticleRow & { body: string | null; created_at: string; has_picks: boolean | null }
+  const row = data as ArticleRow & {
+    subtitle: string | null
+    body: string | null
+    created_at: string
+    has_picks: boolean | null
+  }
 
   const article: TakeawayArticle = {
     ...toCard(row),
+    subtitle: row.subtitle ?? '',
     body: row.body ?? '',
     hasJoelPicks: row.has_picks ?? false,
     createdAt: row.created_at,
   }
 
   if (locale === 'en') return article
-  const [title, excerpt, body] = await translateTexts([article.title, article.excerpt, article.body], locale)
-  return { ...article, title: title ?? article.title, excerpt: excerpt ?? article.excerpt, body: body ?? article.body }
+  const [title, subtitle, excerpt, body] = await translateTexts(
+    [article.title, article.subtitle, article.excerpt, article.body],
+    locale,
+  )
+  return {
+    ...article,
+    title: title ?? article.title,
+    subtitle: subtitle ?? article.subtitle,
+    excerpt: excerpt ?? article.excerpt,
+    body: body ?? article.body,
+  }
 }
 
 export async function getApprovedRecs(limit = 20, category?: string): Promise<CommunityRec[]> {

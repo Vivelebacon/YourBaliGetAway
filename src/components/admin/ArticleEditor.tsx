@@ -17,6 +17,7 @@ export interface ArticleRow {
   id: string
   slug: string
   title: string
+  subtitle: string | null
   excerpt: string | null
   category: string
   cover_url: string | null
@@ -45,6 +46,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
   const router = useRouter()
 
   const [title, setTitle] = useState(initial.title)
+  const [subtitle, setSubtitle] = useState(initial.subtitle ?? '')
   const [excerpt, setExcerpt] = useState(initial.excerpt ?? '')
   const [category, setCategory] = useState(initial.category)
   const [coverUrl, setCoverUrl] = useState(initial.cover_url ?? '')
@@ -90,6 +92,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
       .from('takeaway_articles')
       .update({
         title: title.trim(),
+        subtitle: subtitle.trim() || null,
         excerpt: excerpt.trim() || null,
         category,
         cover_url: coverUrl || null,
@@ -178,6 +181,13 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
         <div>
           <label className="mb-1.5 block text-sm font-medium text-stone-700">Title</label>
           <input value={title} onChange={(e) => setTitle(e.target.value)} className={field} />
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-stone-700">
+            Subtitle (optional: one line shown under the title on the article)
+          </label>
+          <input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} className={field} />
         </div>
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

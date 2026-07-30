@@ -103,6 +103,11 @@ export default async function TakeawayArticlePage({ params }: Props) {
           <h1 className="max-w-4xl font-serif text-4xl font-light text-white [text-shadow:_0_2px_16px_rgba(0,0,0,0.5)] md:text-6xl">
             {article.title}
           </h1>
+          {article.subtitle && (
+            <p className="mt-5 max-w-2xl font-serif text-lg font-light italic leading-relaxed text-white/90 [text-shadow:_0_1px_10px_rgba(0,0,0,0.6)] md:text-xl">
+              {article.subtitle}
+            </p>
+          )}
         </div>
       </section>
 

@@ -41,6 +41,7 @@ create table if not exists public.takeaway_articles (
   id           uuid primary key default gen_random_uuid(),
   slug         text unique not null,
   title        text not null,
+  subtitle     text, -- optional line shown under the title in the article hero
   excerpt      text,
   category     text not null default 'explore',
   cover_url    text,
