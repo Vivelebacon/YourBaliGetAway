@@ -25,12 +25,15 @@ export default function TriedTested({
       {items.map((item, i) => {
         const c = copy[i] ?? item
         const placeholder = item.status === 'placeholder'
+        // A slot with no photo yet gets the dashed outline; once it has an
+        // image the card reads as a real card carrying a "coming soon" tag.
+        const outlined = placeholder && !item.image
         return (
           <Reveal key={`${item.category}-${i}`} delay={(i % 3) * 0.06}>
             <Link
               href={categoryHref(item.category)}
               className={`group flex h-full flex-col rounded-2xl border p-6 transition-all duration-500 ease-out hover:-translate-y-1 hover:border-villa-gold/40 hover:shadow-[0_18px_40px_-22px_rgba(61,90,62,0.4)] ${
-                placeholder ? 'border-dashed border-stone-300 bg-white/60' : 'border-stone-200/80 bg-white'
+                outlined ? 'border-dashed border-stone-300 bg-white/60' : 'border-stone-200/80 bg-white'
               }`}
             >
               {item.image && (
@@ -54,7 +57,7 @@ export default function TriedTested({
               </div>
               <h3
                 className={`mt-3 font-serif text-xl font-light leading-snug transition-colors duration-300 group-hover:text-villa-green ${
-                  placeholder ? 'text-villa-dark/70' : 'text-villa-dark'
+                  outlined ? 'text-villa-dark/70' : 'text-villa-dark'
                 }`}
               >
                 {c.title}

@@ -25,10 +25,46 @@ export interface TriedTestedItem {
 }
 
 export const TRIED_AND_TESTED: TriedTestedItem[] = [
-  { kind: 'Massage & Wellness', title: 'A therapist and a treatment worth booking twice', category: 'wellness', status: 'placeholder' },
-  { kind: 'Food & Drink', title: 'One dish, at one restaurant, ordered the right way', category: 'food', status: 'placeholder' },
-  { kind: 'Sunsets & Beach Bars', title: 'A sunset spot, and the seat to ask for', category: 'beaches', status: 'placeholder' },
-  { kind: 'Activities & Entertainment', title: 'A Latin dance class or social that is genuinely good', category: 'activities', status: 'placeholder' },
-  { kind: 'Live Music', title: 'A band or performance worth planning an evening around', category: 'beaches', status: 'placeholder' },
-  { kind: 'Day Trips & Culture', title: 'A guide or excursion we would send friends to', category: 'explore', status: 'placeholder' },
+  {
+    kind: 'Massage & Wellness',
+    title: 'A therapist and a treatment worth booking twice',
+    category: 'wellness',
+    image: '/takeaways/picks/therapist.webp',
+    status: 'placeholder',
+  },
+  {
+    kind: 'Food & Drink',
+    title: 'One dish, at one restaurant, ordered the right way',
+    category: 'food',
+    image: '/takeaways/picks/dish.webp',
+    status: 'placeholder',
+  },
+  {
+    kind: 'Sunsets & Beach Bars',
+    title: 'A sunset spot, and the seat to ask for',
+    category: 'beaches',
+    image: '/takeaways/picks/sunset.webp',
+    status: 'placeholder',
+  },
+  {
+    kind: 'Activities & Entertainment',
+    title: 'A Latin dance class or social that is genuinely good',
+    category: 'activities',
+    image: '/takeaways/picks/dance.webp',
+    status: 'placeholder',
+  },
+  {
+    kind: 'Live Music',
+    title: 'A band or performance worth planning an evening around',
+    category: 'beaches',
+    image: '/takeaways/picks/live-music.webp',
+    status: 'placeholder',
+  },
+  {
+    kind: 'Day Trips & Culture',
+    title: 'A guide or excursion we would send friends to',
+    category: 'explore',
+    image: '/takeaways/picks/excursion.webp',
+    status: 'placeholder',
+  },
 ]

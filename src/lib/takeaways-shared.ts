@@ -29,36 +29,43 @@ export const TAKEAWAY_CATEGORIES: TakeawayCategory[] = [
     slug: 'food',
     label: 'Food & Drink',
     description: 'Specific dishes, restaurants, cocktails, tables, and useful ordering advice.',
+    image: '/takeaways/categories/food.webp',
   },
   {
     slug: 'wellness',
     label: 'Massage & Wellness',
     description: 'Therapists, treatments, wellness experiences, and advice on finding the right specialist.',
+    image: '/takeaways/categories/wellness.webp',
   },
   {
     slug: 'beaches',
     label: 'Sunsets, Beach Bars & Live Music',
     description: 'Where to sit, when to arrive, what to wear, and which venues or performances are worth checking.',
+    image: '/takeaways/categories/beaches.webp',
   },
   {
     slug: 'activities',
     label: 'Activities & Entertainment',
     description: 'Dance classes, dance socials, shows, nightlife, and other enjoyable things to do around Bali.',
+    image: '/takeaways/categories/activities.webp',
   },
   {
     slug: 'explore',
     label: 'Day Trips & Culture',
     description: 'Excursions, tours, cultural experiences, and places worth exploring beyond the villa.',
+    image: '/takeaways/categories/explore.webp',
   },
   {
     slug: 'practical',
     label: 'Practical Bali Tips',
     description: 'Helpful and entertaining explanations of things visitors often wonder about.',
+    image: '/takeaways/categories/practical.webp',
   },
   {
     slug: 'perks',
     label: 'Guest Discounts & Perks',
     description: 'Current benefits and special offers available to Your Bali Getaway guests.',
+    image: '/takeaways/categories/perks.webp',
     href: '/takeaways/perks',
   },
   {
