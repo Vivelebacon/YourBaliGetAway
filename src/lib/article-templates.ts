@@ -1,7 +1,8 @@
 // Ready-made article scaffolds for the Takeaways CMS. Joel picks one when
 // creating an article (or switches the category in the editor): it pre-fills a
 // structured body with headings and prompts, so he only fills in the blanks.
-// One template per category, so changing the category swaps the template.
+// Changing the category in the editor swaps the template: templateForCategory
+// returns the first template declared for that category.
 // Client-safe: no server-only imports.
 
 export interface ArticleTemplate {
@@ -15,19 +16,6 @@ export interface ArticleTemplate {
 }
 
 export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
-  {
-    id: 'joel',
-    label: "Joel's special",
-    category: 'joel',
-    hint: 'A personal pick or a perfect day, in your own voice.',
-    excerpt: 'A personal recommendation from your host, tried and tested.',
-    body: `<p><em>Tell it in your own voice: what is this, and why do you love it?</em></p>
-<h2>The story</h2>
-<p><em>How you found it, or how you'd spend the day.</em></p>
-<h2>What to do</h2>
-<p><em>The specifics: where, when, what to order or ask for.</em></p>`,
-    joelPicks: `<p><em>Members only: the detail you'd only tell a friend.</em></p>`,
-  },
   {
     id: 'restaurants',
     label: 'Restaurants / where to eat',
@@ -45,8 +33,10 @@ export const ARTICLE_TEMPLATES: ArticleTemplate[] = [
   },
   {
     id: 'bars',
+    // Drinks live under Food & Drink now. Still pickable by name when creating
+    // an article; templateForCategory returns the Restaurants one for 'food'.
     label: 'Bars / drinks / nightlife',
-    category: 'bars',
+    category: 'food',
     hint: 'Where to go for a drink, sunset cocktail or a night out.',
     excerpt: 'From a quiet sunset cocktail to a proper night out, here is where to go for a drink nearby.',
     body: `<p><em>Set the scene: what is the drinks and nightlife scene like here?</em></p>

@@ -174,3 +174,15 @@ revoke select (joel_picks) on public.takeaway_articles from anon;
 -- Public boolean flag: does a gated picks block exist (without leaking it)?
 alter table public.takeaway_articles
   add column if not exists has_picks boolean generated always as (joel_picks is not null and length(joel_picks) > 0) stored;
+
+-- 6) Takeaways landing-page restructure (applied 2026-07-31)
+-- Per-article byline: the guide is an editorial hub with several possible
+-- authors, not Joel's personal column. Null falls back to the house byline.
+alter table public.takeaway_articles add column if not exists author text;
+
+-- Category rework: "Joel's Specials" is retired and Bars is folded into
+-- Food & Drink. Re-home any rows still on the old slugs.
+update public.takeaway_articles set category = 'food'      where category = 'bars';
+update public.takeaway_articles set category = 'practical' where category = 'joel';
+update public.takeaway_recs     set category = 'food'      where category = 'bars';
+update public.takeaway_recs     set category = 'practical' where category = 'joel';

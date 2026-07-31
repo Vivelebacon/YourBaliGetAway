@@ -21,6 +21,7 @@ export interface ArticleRow {
   excerpt: string | null
   category: string
   cover_url: string | null
+  author: string | null
   body: string | null
   joel_picks: string | null
   featured: boolean
@@ -50,6 +51,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
   const [excerpt, setExcerpt] = useState(initial.excerpt ?? '')
   const [category, setCategory] = useState(initial.category)
   const [coverUrl, setCoverUrl] = useState(initial.cover_url ?? '')
+  const [author, setAuthor] = useState(initial.author ?? '')
   const [body, setBody] = useState(initial.body ?? '')
   const [picks, setPicks] = useState(initial.joel_picks ?? '')
   const [featured, setFeatured] = useState(initial.featured)
@@ -96,6 +98,7 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
         excerpt: excerpt.trim() || null,
         category,
         cover_url: coverUrl || null,
+        author: author.trim() || null,
         body: body || null,
         joel_picks: picks || null,
         featured,
@@ -190,11 +193,27 @@ export default function ArticleEditor({ initial }: { initial: ArticleRow }) {
           <input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} className={field} />
         </div>
 
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-stone-700">
+            Author (optional: the byline shown on the card and the article)
+          </label>
+          <input
+            value={author}
+            onChange={(e) => setAuthor(e.target.value)}
+            placeholder="Your Bali Getaway"
+            className={field}
+          />
+          <p className="mt-1 text-xs text-stone-400">
+            Leave empty to publish under the house byline, &ldquo;Your Bali Getaway&rdquo;.
+          </p>
+        </div>
+
         <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           <div>
             <label className="mb-1.5 block text-sm font-medium text-stone-700">Category</label>
             <select value={category} onChange={(e) => changeCategory(e.target.value)} className={field}>
-              {TAKEAWAY_CATEGORIES.map((c) => (
+              {/* Perks are not an article category: they live on their own page. */}
+              {TAKEAWAY_CATEGORIES.filter((c) => !c.href).map((c) => (
                 <option key={c.slug} value={c.slug}>
                   {c.label}
                 </option>

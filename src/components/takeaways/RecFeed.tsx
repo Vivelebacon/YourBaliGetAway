@@ -456,7 +456,7 @@ function Composer({ onPosted }: { onPosted: (rec: CommunityRec) => void }) {
             onChange={(e) => setCategory(e.target.value)}
             className="rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm outline-none focus:border-villa-green"
           >
-            {TAKEAWAY_CATEGORIES.filter((c) => c.slug !== 'joel').map((c) => (
+            {TAKEAWAY_CATEGORIES.filter((c) => c.slug !== 'perks').map((c) => (
               <option key={c.slug} value={c.slug}>
                 {t(c.label)}
               </option>

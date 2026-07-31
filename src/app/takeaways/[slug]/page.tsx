@@ -8,7 +8,7 @@ import Reveal from '@/components/takeaways/Reveal'
 import ArticleCard from '@/components/takeaways/ArticleCard'
 import JoelPicks from '@/components/takeaways/JoelPicks'
 import RecFeed from '@/components/takeaways/RecFeed'
-import { getArticleBySlug, getArticlesList, categoryLabel } from '@/lib/takeaways'
+import { getArticleBySlug, getArticlesList, categoryLabel, categoryHref } from '@/lib/takeaways'
 import { getLocale } from '@/lib/locale'
 import { getMessages } from '@/lib/translate'
 import { createClient } from '@/lib/supabase/server'
@@ -69,7 +69,7 @@ export default async function TakeawayArticlePage({ params }: Props) {
     image: article.coverUrl || `${SITE_URL}/takeaways/hero-poster.jpg`,
     datePublished: article.createdAt,
     dateModified: article.updatedAt,
-    author: { '@type': 'Person', name: 'Joel', jobTitle: 'Host, Your Bali Getaway' },
+    author: { '@type': 'Person', name: article.author },
     publisher: { '@type': 'Organization', name: SITE_NAME, url: SITE_URL },
     mainEntityOfPage: `${SITE_URL}/takeaways/${article.slug}`,
   }
@@ -97,9 +97,12 @@ export default async function TakeawayArticlePage({ params }: Props) {
         <div className="absolute inset-0 bg-black/40" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-villa-cream" />
         <div className="absolute inset-0 flex flex-col items-center justify-center px-6 pt-16 text-center">
-          <p className="mb-4 text-xs uppercase tracking-[0.4em] text-villa-gold [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]">
+          <Link
+            href={categoryHref(article.category)}
+            className="mb-4 text-xs uppercase tracking-[0.4em] text-villa-gold transition-opacity [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)] hover:opacity-80"
+          >
             {t(categoryLabel(article.category))}
-          </p>
+          </Link>
           <h1 className="max-w-4xl font-serif text-4xl font-light text-white [text-shadow:_0_2px_16px_rgba(0,0,0,0.5)] md:text-6xl">
             {article.title}
           </h1>
@@ -108,6 +111,9 @@ export default async function TakeawayArticlePage({ params }: Props) {
               {article.subtitle}
             </p>
           )}
+          <p className="mt-6 text-xs uppercase tracking-[0.25em] text-white/80 [text-shadow:_0_1px_8px_rgba(0,0,0,0.6)]">
+            {t('By')} {article.author}
+          </p>
         </div>
       </section>
 
@@ -200,7 +206,8 @@ export default async function TakeawayArticlePage({ params }: Props) {
                   article={a}
                   categoryLabel={t(categoryLabel(a.category))}
                   readLabel={t('Read article')}
-                        membersLabel={t('Members')}
+                  membersLabel={t('Members')}
+                  byLabel={t('By')}
                 />
               ))}
             </div>

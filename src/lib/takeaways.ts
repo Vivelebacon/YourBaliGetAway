@@ -18,8 +18,19 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_ANON, {
 
 // Categories and shared types live in takeaways-shared.ts (client-safe);
 // re-exported here so server code can import everything from one place.
-export { TAKEAWAY_CATEGORIES, categoryLabel, type CommunityRec } from '@/lib/takeaways-shared'
+export {
+  TAKEAWAY_CATEGORIES,
+  PUBLIC_CATEGORIES,
+  categoryLabel,
+  categoryHref,
+  findCategory,
+  type TakeawayCategory,
+  type CommunityRec,
+} from '@/lib/takeaways-shared'
 import type { CommunityRec } from '@/lib/takeaways-shared'
+
+/** House byline used when an article has no explicit author. */
+export const DEFAULT_AUTHOR = 'Your Bali Getaway'
 
 export interface TakeawayArticleCard {
   slug: string
@@ -27,6 +38,7 @@ export interface TakeawayArticleCard {
   excerpt: string
   category: string
   coverUrl: string
+  author: string
   featured: boolean
   membersOnly: boolean
   updatedAt: string
@@ -45,12 +57,13 @@ interface ArticleRow {
   excerpt: string | null
   category: string
   cover_url: string | null
+  author: string | null
   featured: boolean
   members_only: boolean
   updated_at: string
 }
 
-const CARD_COLS = 'slug,title,excerpt,category,cover_url,featured,members_only,updated_at'
+const CARD_COLS = 'slug,title,excerpt,category,cover_url,author,featured,members_only,updated_at'
 
 function toCard(r: ArticleRow): TakeawayArticleCard {
   return {
@@ -59,6 +72,7 @@ function toCard(r: ArticleRow): TakeawayArticleCard {
     excerpt: r.excerpt ?? '',
     category: r.category,
     coverUrl: r.cover_url ? imageUrl(r.cover_url) : '',
+    author: r.author?.trim() || DEFAULT_AUTHOR,
     featured: r.featured,
     membersOnly: r.members_only,
     updatedAt: r.updated_at,
@@ -77,6 +91,18 @@ export async function getArticlesList(locale = 'en'): Promise<TakeawayArticleCar
     .from('takeaway_articles')
     .select(CARD_COLS)
     .eq('published', true)
+    .order('sort_order', { ascending: true })
+  if (error || !data) return []
+  return localizeCards((data as ArticleRow[]).map(toCard), locale)
+}
+
+/** Articles in one category, for the dedicated category pages. */
+export async function getArticlesByCategory(category: string, locale = 'en'): Promise<TakeawayArticleCard[]> {
+  const { data, error } = await supabase
+    .from('takeaway_articles')
+    .select(CARD_COLS)
+    .eq('published', true)
+    .eq('category', category)
     .order('sort_order', { ascending: true })
   if (error || !data) return []
   return localizeCards((data as ArticleRow[]).map(toCard), locale)
@@ -107,6 +133,7 @@ export async function getArticleBySlug(slug: string, locale = 'en'): Promise<Tak
     created_at: string
     has_picks: boolean | null
   }
+
 
   const article: TakeawayArticle = {
     ...toCard(row),
