@@ -43,7 +43,10 @@ interface BookingCalendarProps {
 }
 
 const WEEKDAYS = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
-const MONTHS_TO_LOAD = 12
+// How far ahead the calendar is loaded. Hostaway (and the Airbnb sync behind it)
+// does not publish rates/availability much beyond 24 months, so loading more
+// would only add empty months.
+const MONTHS_TO_LOAD = 24
 
 export default function BookingCalendar({ listingId, villaName, maxGuests }: BookingCalendarProps) {
   const today = useMemo(() => {
@@ -71,7 +74,7 @@ export default function BookingCalendar({ listingId, villaName, maxGuests }: Boo
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [done, setDone] = useState(false)
 
-  // ── Load availability for the next 12 months ──
+  // ── Load availability for the next MONTHS_TO_LOAD months ──
   useEffect(() => {
     let cancelled = false
     async function load() {
