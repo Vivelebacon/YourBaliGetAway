@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Script from 'next/script'
 import './globals.css'
 import { CurrencyProvider } from '@/components/CurrencyProvider'
 import { LanguageProvider } from '@/components/LanguageProvider'
@@ -39,6 +40,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   return (
     <html lang={locale}>
       <body suppressHydrationWarning>
+        {/* Google tag (gtag.js) */}
+        <Script async src="https://www.googletagmanager.com/gtag/js?id=G-E5NZFPCCGE" strategy="afterInteractive" />
+        <Script id="google-tag" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-E5NZFPCCGE');`}
+        </Script>
         {/* Sitewide entities for search engines and AI crawlers. Renders no UI. */}
         <script
           type="application/ld+json"
